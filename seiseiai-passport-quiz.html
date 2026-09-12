@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生成AIパスポート 4択クイズ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #1B2430;
+    --ink-2: #232E3D;
+    --paper: #F6F1E4;
+    --line: #D8CFB6;
+    --stamp: #B8483B;
+    --stamp-dark:#8F372C;
+    --gold: #A98449;
+    --green:#4B7A5A;
+    --text-dark: #2B2620;
+    --text-muted: #736A5A;
+    --cream-text: #EFE7D4;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 20% -10%, #2A3547 0%, transparent 55%),
+      var(--ink);
+    color:var(--cream-text);
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:100vh;
+    padding:32px 16px 48px;
+  }
+  header{
+    width:100%;
+    max-width:620px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:22px;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  h1{
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:800;
+    font-size:26px;
+    margin:0;
+    letter-spacing:.03em;
+    color:var(--cream-text);
+  }
+  h1 span{
+    display:block;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:500;
+    font-size:12.5px;
+    letter-spacing:.12em;
+    color:#9AA6B8;
+    margin-top:4px;
+  }
+  .meta{
+    font-size:13px;
+    color:#9AA6B8;
+    text-align:right;
+    line-height:1.6;
+  }
+  .meta b{color:var(--cream-text); font-weight:700;}
+
+  .controls{
+    width:100%;
+    max-width:620px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  select{
+    appearance:none;
+    background:var(--ink-2);
+    color:var(--cream-text);
+    border:1px solid #3A4557;
+    border-radius:6px;
+    padding:9px 34px 9px 12px;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:14px;
+    background-image: linear-gradient(45deg, transparent 50%, #9AA6B8 50%), linear-gradient(135deg, #9AA6B8 50%, transparent 50%);
+    background-position: calc(100% - 16px) 15px, calc(100% - 11px) 15px;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat:no-repeat;
+    cursor:pointer;
+  }
+  .progress-text{font-size:13px; color:#9AA6B8;}
+
+  .stage{width:100%; max-width:620px;}
+  .card{
+    position:relative;
+    background:var(--paper);
+    border-radius:3px;
+    box-shadow: 0 22px 40px -18px rgba(0,0,0,.55);
+    padding:34px 28px 26px;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    left:0; right:0; top:0;
+    height:6px;
+    background:repeating-linear-gradient(90deg, var(--line) 0 10px, transparent 10px 20px);
+    border-radius:3px 3px 0 0;
+  }
+  .tag{
+    position:absolute;
+    top:16px; left:18px;
+    font-size:12px;
+    letter-spacing:.08em;
+    color:#fff;
+    background:var(--gold);
+    padding:4px 11px 5px;
+    border-radius:2px;
+    font-weight:700;
+  }
+  .card-index{
+    position:absolute;
+    top:18px; right:20px;
+    font-size:12px;
+    color:var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .prompt-label{
+    text-align:center;
+    font-size:13px;
+    color:var(--text-muted);
+    margin-top:14px;
+  }
+  .term{
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:800;
+    font-size:clamp(24px, 5vw, 34px);
+    color:var(--text-dark);
+    line-height:1.4;
+    text-align:center;
+    margin:8px 0 24px;
+  }
+
+  .options{display:flex; flex-direction:column; gap:10px;}
+  .option{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    text-align:left;
+    background:#fff;
+    border:1.5px solid var(--line);
+    border-radius:6px;
+    padding:13px 15px;
+    cursor:pointer;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:14.5px;
+    line-height:1.65;
+    color:var(--text-dark);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .option:hover:not(.disabled){border-color:var(--gold);}
+  .option .letter{
+    flex:0 0 auto;
+    width:24px; height:24px;
+    border-radius:50%;
+    background:var(--ink-2);
+    color:var(--cream-text);
+    font-size:12.5px;
+    font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    margin-top:1px;
+  }
+  .option.disabled{cursor:default;}
+  .option.correct{
+    border-color:var(--green);
+    background:#EFF6F1;
+  }
+  .option.correct .letter{background:var(--green);}
+  .option.incorrect{
+    border-color:var(--stamp);
+    background:#FBEEEC;
+  }
+  .option.incorrect .letter{background:var(--stamp);}
+
+  .result{
+    margin-top:22px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+  }
+  .verdict{
+    display:inline-block;
+    font-size:13px;
+    font-weight:700;
+    padding:4px 12px 5px;
+    border-radius:2px;
+    color:#fff;
+    margin-bottom:14px;
+  }
+  .verdict.correct{background:var(--green);}
+  .verdict.incorrect{background:var(--stamp);}
+
+  .chapter-pill{
+    display:inline-block;
+    font-size:12px;
+    color:var(--text-muted);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:3px 9px;
+    margin-bottom:10px;
+  }
+  .explain-body{
+    font-size:14.5px;
+    line-height:1.85;
+    color:var(--text-dark);
+  }
+
+  .actions{
+    width:100%;
+    max-width:620px;
+    display:flex;
+    gap:12px;
+    margin-top:22px;
+  }
+  button.act{
+    flex:1;
+    padding:14px 10px;
+    border:none;
+    border-radius:5px;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .12s ease, opacity .12s ease;
+  }
+  button.act:active{transform:scale(.97);}
+  .btn-secondary{
+    background:transparent;
+    color:var(--cream-text);
+    border:1px solid #3A4557;
+  }
+  .btn-primary{
+    background:var(--stamp);
+    color:#fff;
+  }
+  .btn-primary:hover, .btn-secondary:hover{opacity:.9;}
+
+  footer{
+    margin-top:30px;
+    font-size:12px;
+    color:#5C687C;
+    text-align:center;
+    max-width:620px;
+  }
+
+  @media (max-width:480px){
+    .card{padding:28px 18px 20px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>生成AIパスポート 4択クイズ<span>用語の正しい説明を1つ選ぶ形式・章番号つき解説</span></h1>
+  <div class="meta">出題プール <b id="poolCount">-</b> 問<br>正解 <b id="correctCount">0</b> / <b id="attemptedCount">0</b></div>
+</header>
+
+<div class="controls">
+  <select id="categorySelect"></select>
+  <div class="progress-text" id="progressText"></div>
+</div>
+
+<div class="stage">
+  <div class="card" id="card">
+    <div class="tag" id="tagFront">カテゴリ</div>
+    <div class="card-index" id="idxFront"></div>
+    <div class="prompt-label">次の用語の正しい説明はどれ？</div>
+    <div class="term" id="termFront">読み込み中...</div>
+    <div class="options" id="options"></div>
+    <div class="result" id="result" style="display:none;">
+      <div class="verdict" id="verdict"></div>
+      <div class="chapter-pill" id="chapterPill"></div>
+      <div class="explain-body" id="explainText"></div>
+    </div>
+  </div>
+</div>
+
+<div class="actions">
+  <button class="act btn-secondary" id="skipBtn">この問題をスキップ</button>
+  <button class="act btn-primary" id="nextBtn" style="display:none;">次の問題</button>
+</div>
+
+<footer>全44問・第1〜5章 ／ カテゴリを選ぶと、そのカテゴリ内だけからランダム出題します。</footer>
+
+<script>
+const CATS = {
+  history:  "AIの歴史・概論",
+  ml:       "機械学習の基礎",
+  gentech:  "生成AIの技術",
+  prompt:   "プロンプトエンジニアリング",
+  business: "活用・ビジネス",
+  law:      "法律・権利",
+  ethics:   "倫理・社会的リスク",
+  security: "セキュリティ"
+};
+
+const CHAPTERS = {
+  1: "第1章　AI（人工知能）",
+  2: "第2章　生成AI（ジェネレーティブAI）",
+  3: "第3章　現在の生成AI（ジェネレーティブAI）の動向",
+  4: "第4章　情報リテラシー・基本理念とAI社会原則",
+  5: "第5章　テキスト生成AIのプロンプト制作と実例"
+};
+
+const TERMS = [
+{cat:"history",ch:1,term:"人工知能（AI）",answer:"人間の知的活動をコンピュータで模倣・再現する技術や研究分野の総称。",explain:"明確な単一の定義があるわけではなく、時代や研究者によって捉え方が変化してきた。近年は機械学習・深層学習の発展により実用化が急速に進んでいる。"},
+{cat:"history",ch:1,term:"チューリングテスト",answer:"会話の受け答えだけで相手が人間か機械か判別できなければ、その機械は知能を持つとみなす思考実験。",explain:"アラン・チューリングが提案したもので、機械が「考えられるか」を直接問うのではなく、外部から見た振る舞いで知能を判定しようとする発想が特徴。"},
+{cat:"history",ch:1,term:"AI効果",answer:"AIが新しい問題を解決すると、その仕組みが分かった途端に「それは単なる自動化で知能ではない」とみなされてしまう現象。",explain:"将棋や画像認識など、実現した瞬間に「知能」の定義から除外されがちで、AIの進歩が過小評価される一因とされる。"},
+{cat:"history",ch:1,term:"シンギュラリティ（技術的特異点）",answer:"AIが人間の知能を超え、技術の進歩が人間の制御を離れて加速度的に進むと予測される仮説上の時点。",explain:"未来学者レイ・カーツワイルらが提唱した概念で、実現時期や是非については専門家の間でも意見が分かれる。"},
+{cat:"history",ch:1,term:"第3次AIブーム",answer:"2010年代以降、ディープラーニングの実用化を契機に起きた現在進行形のAIブーム。",explain:"過去2回のブームが期待ほどの成果を出せず停滞（AIの冬）したのに対し、今回は画像認識・自然言語処理などで実際の成果が積み上がっている点が特徴。"},
+
+{cat:"ml",ch:1,term:"機械学習",answer:"コンピュータが大量のデータからパターンやルールを自動的に学習する手法の総称。",explain:"人間があらかじめ全てのルールを記述するのではなく、データから統計的な規則性を見つけ出す点が従来のプログラミングと異なる。"},
+{cat:"ml",ch:1,term:"ディープラーニング（深層学習）",answer:"人間の脳の神経回路を模した多層のニューラルネットワークを用いる機械学習の手法。",explain:"層を深く重ねることで画像・音声・言語など複雑なデータから高度な特徴を自動で抽出できるようになり、生成AIの基盤技術となっている。"},
+{cat:"ml",ch:1,term:"ニューラルネットワーク",answer:"脳の神経細胞（ニューロン）の仕組みを数理モデル化した、機械学習の基本構造。",explain:"入力層・中間層（隠れ層）・出力層から構成され、層と層をつなぐ重みを学習することでデータのパターンを表現する。"},
+{cat:"ml",ch:1,term:"教師あり学習",answer:"入力データと正解ラベルの組み合わせを与えて学習させる機械学習の方式。",explain:"迷惑メール判定や画像分類など、正解が明確なタスクに用いられる代表的な学習方式。"},
+{cat:"ml",ch:1,term:"教師なし学習",answer:"正解ラベルを与えず、データ自体の構造や類似性からパターンを見つけ出す学習方式。",explain:"クラスタリングや次元削減などに用いられ、データの背後にある規則性を人間が事前に定義しなくてよい点が特徴。"},
+{cat:"ml",ch:1,term:"強化学習",answer:"エージェントが試行錯誤を通じて環境から報酬を得ながら、望ましい行動を学習する手法。",explain:"囲碁AIのAlphaGoなどで有名になった手法で、生成AIの応答を人の評価に基づいて調整するRLHFにも応用されている。"},
+
+{cat:"gentech",ch:2,term:"生成AI（ジェネレーティブAI）",answer:"学習したデータのパターンをもとに、文章・画像・音声・動画などの新しいコンテンツを生成できるAIの総称。",explain:"既存データを分類・予測する「識別系AI」に対し、新たなアウトプットを作り出す点が特徴で、ChatGPTや画像生成AIなどが代表例。"},
+{cat:"gentech",ch:5,term:"大規模言語モデル（LLM）",answer:"インターネット上の膨大なテキストデータを学習し、文章の生成や理解を行う大規模なニューラルネットワークモデル。",explain:"パラメータ数が非常に多く、翻訳・要約・対話など幅広い自然言語処理タスクに汎用的に対応できる点が特徴。"},
+{cat:"gentech",ch:2,term:"トランスフォーマー",answer:"「Attention（注意機構）」という仕組みを中核に据えた深層学習のモデル構造。",explain:"2017年に発表されて以降、文章中の単語同士の関係性を効率よく捉えられるため、多くのLLMのベースアーキテクチャとして採用されている。"},
+{cat:"gentech",ch:2,term:"Attention（注意機構）",answer:"文章中のどの単語に注目すべきかを重み付けして計算する仕組み。",explain:"離れた位置にある単語同士の関連性も捉えられるため、文脈を踏まえた自然な文章生成が可能になる。"},
+{cat:"gentech",ch:2,term:"拡散モデル（ディフュージョンモデル）",answer:"ノイズを段階的に加えた画像から、逆にノイズを除去していく過程を学習し、新しい画像を生成する手法。",explain:"Stable DiffusionやMidjourneyなど、多くの画像生成AIで採用されている代表的な技術。"},
+{cat:"gentech",ch:2,term:"GAN（敵対的生成ネットワーク）",answer:"「生成器」と「識別器」という2つのネットワークを競わせながら学習させることで、本物に近いデータを作り出す手法。",explain:"生成器は本物らしいデータを作ろうとし、識別器はそれを見破ろうとする、この競争を通じて生成の精度が高まっていく。"},
+{cat:"gentech",ch:2,term:"マルチモーダルAI",answer:"テキスト・画像・音声・動画など、複数の種類（モダリティ）の情報を組み合わせて扱えるAI。",explain:"画像を見ながら質問に答えたり、音声から文章と画像の両方を生成したりと、より人間に近い柔軟な情報処理が可能になる。"},
+{cat:"gentech",ch:2,term:"ファインチューニング",answer:"汎用的に学習済みのモデルに対し、特定の目的や分野のデータで追加学習を行い、性能を調整する手法。",explain:"ゼロからモデルを作るより少ないデータ・計算資源で、特定用途に適したモデルを作れる点がメリット。"},
+{cat:"gentech",ch:2,term:"パラメータ",answer:"モデルが学習によって調整する内部の数値（重みなど）のこと。",explain:"パラメータ数が多いほど表現力は高まる傾向にあるが、必要な計算資源やデータ量も増加する。"},
+{cat:"gentech",ch:5,term:"トークン",answer:"LLMがテキストを処理する際の最小単位で、単語や単語の一部、記号などに分割されたもの。",explain:"多くのAPIやサービスでは、入出力の量や利用料金がこのトークン数を基準に計算される。"},
+
+{cat:"prompt",ch:5,term:"プロンプト",answer:"生成AIに対して入力する指示文や質問文のこと。",explain:"プロンプトの書き方によって出力の質が大きく変わるため、意図を明確に伝える工夫が重要になる。"},
+{cat:"prompt",ch:5,term:"プロンプトエンジニアリング",answer:"生成AIから望ましい出力を得るために、プロンプトの内容や構成を工夫する技術・手法。",explain:"役割設定、出力形式の指定、具体例の提示などのテクニックを組み合わせて回答の精度を高める。"},
+{cat:"prompt",ch:5,term:"ゼロショット（プロンプティング）",answer:"具体例を一切示さず、指示だけでタスクを実行させる方法。",explain:"モデルが持つ汎用的な知識だけでタスクに対応させる方法で、シンプルな指示ほど効果が出やすい。"},
+{cat:"prompt",ch:5,term:"フューショット（プロンプティング）",answer:"いくつかの具体例（少数の入出力例）をプロンプト内に示した上でタスクを実行させる方法。",explain:"例を示すことで期待する出力形式やスタイルを伝えやすくなり、ゼロショットより精度が向上することが多い。"},
+{cat:"prompt",ch:5,term:"Chain-of-Thought（思考の連鎖）",answer:"「段階的に考えてください」のように、途中の推論過程を出力させることで回答の精度を高めるプロンプト手法。",explain:"計算や論理的な問題など、複雑なタスクにおいて特に効果を発揮するとされる。"},
+
+{cat:"business",ch:3,term:"RAG（検索拡張生成）",answer:"LLMが回答を生成する際に、外部の文書やデータベースを検索し、その情報を踏まえて回答を作る仕組み。",explain:"モデルが学習していない最新情報や社内固有の情報を扱えるようになり、ハルシネーションの抑制にも役立つ。"},
+{cat:"business",ch:3,term:"AIエージェント",answer:"与えられた目標に対して、自ら計画を立て、複数のツールや処理を組み合わせながら自律的にタスクを遂行するAIシステム。",explain:"単発の質問応答にとどまらず、情報収集から実行までの一連の作業を任せられる点が特徴。"},
+{cat:"business",ch:3,term:"コパイロット（AIアシスタント）",answer:"人間の作業を補助・支援する形で活用される生成AIの利用形態。",explain:"文章作成、プログラミング、資料作成など、業務の効率化を目的として人と協調しながら使われる。"},
+{cat:"business",ch:3,term:"ハイパーパーソナライゼーション",answer:"生成AIなどを活用し、個々のユーザーの行動や好みに合わせて体験やコンテンツを高度に個別化すること。",explain:"マーケティングや商品レコメンドなどの分野で、従来より精緻な個別対応を実現する取り組みとして注目されている。"},
+
+{cat:"law",ch:4,term:"著作権とAI生成物の関係",answer:"AIが自律的に生成したコンテンツには、原則として人間の「創作的寄与」がない限り著作権は発生しないとする考え方。",explain:"一方で、生成物を学習データとして利用する行為や、生成物が既存の著作物に類似する場合の権利侵害については、個別の判断が必要とされる。"},
+{cat:"law",ch:4,term:"著作権法第30条の4",answer:"情報解析（AIの学習など）を目的とする場合、一定の条件のもとで著作権者の許諾なく著作物を利用できると定めた日本の著作権法の規定。",explain:"AI開発におけるデータ収集・学習を後押しする条文である一方、著作権者の利益を不当に害する場合は適用されないという例外もある。"},
+{cat:"law",ch:4,term:"個人情報保護法",answer:"個人情報の適正な取り扱いについて定めた法律。",explain:"生成AIに個人情報を入力する行為や、AIが個人情報を含む文章を出力する行為が、この法律との関係で問題になり得る。"},
+{cat:"law",ch:4,term:"利用規約・ガイドライン遵守",answer:"生成AIサービスを利用する際に定められている、利用条件や禁止事項などのルール。",explain:"商用利用の可否、出力物の権利関係、入力データの扱いなどはサービスごとに異なるため、事前確認が求められる。"},
+
+{cat:"ethics",ch:2,term:"ハルシネーション",answer:"生成AIが事実に基づかない誤った情報を、あたかも真実であるかのようにもっともらしく生成してしまう現象。",explain:"LLMは統計的にそれらしい文章を作る仕組みのため、事実確認をしないまま鵜呑みにすると誤情報の拡散につながる恐れがある。"},
+{cat:"ethics",ch:4,term:"バイアス（AIの偏り）",answer:"学習データに含まれる偏りが、AIの出力結果にも反映されてしまう現象。",explain:"性別や人種などに関する差別的な出力につながる場合があり、AI社会原則が掲げる公平性の観点から対策が求められる。"},
+{cat:"ethics",ch:3,term:"ディープフェイク",answer:"AI技術を用いて、実在の人物の顔や声を精巧に加工・合成した偽の画像・映像・音声。",explain:"なりすましや偽情報（ディスインフォメーション）の拡散、名誉毀損などに悪用されるリスクが指摘されており、社会的な対策が課題となっている。"},
+{cat:"ethics",ch:2,term:"AIアライメント",answer:"AIの振る舞いや出力を、人間の意図や価値観、倫理観に沿ったものにするための研究・取り組み。",explain:"有害な出力の抑制や、人間にとって望ましい行動をAIに取らせるための調整（RLHFなど）がこれにあたる。"},
+{cat:"ethics",ch:4,term:"デジタルデバイド",answer:"AIを含むデジタル技術を利用できる人とできない人との間に生じる格差。",explain:"生成AIの普及に伴い、活用スキルや利用環境の差が新たな格差を生む懸念が指摘されている。"},
+{cat:"ethics",ch:4,term:"AI倫理",answer:"AIの開発・利用にあたって配慮すべき、公平性・透明性・安全性などの倫理的な原則や考え方の総称。",explain:"AI社会原則として、人間中心・公平性・プライバシー保護・透明性・アカウンタビリティなどが掲げられている。"},
+{cat:"ethics",ch:4,term:"説明可能なAI（XAI）",answer:"AIがなぜその判断・出力に至ったのかを、人間が理解できる形で説明できるようにする技術・考え方。",explain:"ブラックボックス化しやすいディープラーニングの判断根拠を明らかにし、AI社会原則が求める透明性・アカウンタビリティを確保する目的がある。"},
+
+{cat:"security",ch:4,term:"プロンプトインジェクション",answer:"悪意のある指示文をプロンプトに紛れ込ませることで、AIに開発者の意図しない動作をさせる攻撃手法。",explain:"チャットボットに機密情報を出力させたり、安全対策を無効化させたりする目的で悪用される恐れがあり、生成AIの技術的発展に潜む脅威の一つとされる。"},
+{cat:"security",ch:4,term:"機密情報の漏洩リスク",answer:"生成AIに入力した社内機密情報や個人情報が、学習データとして利用されたり、他のユーザーへの出力に反映されたりするリスク。",explain:"業務利用の際は、サービスの学習利用ポリシーを確認し、機密情報の入力を避けるなどの対策が必要とされる。"},
+{cat:"security",ch:4,term:"サンドボックス化",answer:"AIシステムを外部の重要なシステムやデータから隔離した安全な環境で動作させる考え方・仕組み。",explain:"AIの誤動作や悪用があった場合でも、被害が本番環境やほかのシステムに及ばないようにするための対策の一つ。"}
+];
+
+let pool = [];
+let bag = [];
+let currentIdx = -1;
+let answered = false;
+let score = {correct:0, attempted:0};
+
+const els = {
+  select: document.getElementById('categorySelect'),
+  tagFront: document.getElementById('tagFront'),
+  idxFront: document.getElementById('idxFront'),
+  termFront: document.getElementById('termFront'),
+  options: document.getElementById('options'),
+  result: document.getElementById('result'),
+  verdict: document.getElementById('verdict'),
+  chapterPill: document.getElementById('chapterPill'),
+  explainText: document.getElementById('explainText'),
+  skipBtn: document.getElementById('skipBtn'),
+  nextBtn: document.getElementById('nextBtn'),
+  poolCount: document.getElementById('poolCount'),
+  correctCount: document.getElementById('correctCount'),
+  attemptedCount: document.getElementById('attemptedCount'),
+  progressText: document.getElementById('progressText'),
+};
+
+function buildCategoryOptions(){
+  const opt = document.createElement('option');
+  opt.value = 'all';
+  opt.textContent = 'すべてのカテゴリ';
+  els.select.appendChild(opt);
+  Object.entries(CATS).forEach(([key, label])=>{
+    const o = document.createElement('option');
+    o.value = key;
+    o.textContent = label;
+    els.select.appendChild(o);
+  });
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function rebuildPool(){
+  const val = els.select.value;
+  pool = TERMS
+    .map((t,i)=>i)
+    .filter(i => val === 'all' || TERMS[i].cat === val);
+  bag = shuffle(pool);
+  score = {correct:0, attempted:0};
+  els.poolCount.textContent = pool.length;
+  updateScore();
+  drawNext();
+}
+
+function updateScore(){
+  els.correctCount.textContent = score.correct;
+  els.attemptedCount.textContent = score.attempted;
+  els.progressText.textContent = `全 ${pool.length} 問中 ${score.attempted} 問に解答`;
+}
+
+function pickDistractors(correctIdx, n){
+  const t = TERMS[correctIdx];
+  let sameCat = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && TERMS[i].cat===t.cat);
+  let others = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && TERMS[i].cat!==t.cat);
+  sameCat = shuffle(sameCat);
+  others = shuffle(others);
+  let picks = sameCat.slice(0, n);
+  if(picks.length < n){
+    picks = picks.concat(others.slice(0, n - picks.length));
+  }
+  return picks;
+}
+
+function drawNext(){
+  if(bag.length === 0){
+    bag = shuffle(pool);
+    if(bag.length > 1 && bag[bag.length-1] === currentIdx){
+      [bag[bag.length-1], bag[bag.length-2]] = [bag[bag.length-2], bag[bag.length-1]];
+    }
+  }
+  currentIdx = bag.pop();
+  answered = false;
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const t = TERMS[currentIdx];
+  els.tagFront.textContent = CATS[t.cat];
+  els.idxFront.textContent = `${score.attempted + 1} / ${pool.length}`;
+  els.termFront.textContent = t.term;
+
+  const distractorIdx = pickDistractors(currentIdx, 3);
+  const optionIdxs = shuffle([currentIdx, ...distractorIdx]);
+
+  els.options.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  optionIdxs.forEach((idx, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${TERMS[idx].answer}</span>`;
+    btn.addEventListener('click', ()=> handleAnswer(idx, btn));
+    els.options.appendChild(btn);
+  });
+
+  els.result.style.display = 'none';
+  els.nextBtn.style.display = 'none';
+  els.skipBtn.style.display = 'block';
+}
+
+function handleAnswer(selectedIdx, btnEl){
+  if(answered) return;
+  answered = true;
+  score.attempted += 1;
+  const isCorrect = selectedIdx === currentIdx;
+  if(isCorrect) score.correct += 1;
+  updateScore();
+
+  const optionButtons = Array.from(els.options.children);
+  optionButtons.forEach(b => b.classList.add('disabled'));
+  optionButtons.forEach(b => { b.onclick = null; });
+
+  optionButtons.forEach((b, i)=>{
+    if(b === btnEl && isCorrect){ b.classList.add('correct'); }
+    else if(b === btnEl && !isCorrect){ b.classList.add('incorrect'); }
+  });
+  if(!isCorrect){
+    optionButtons.forEach(b=>{
+      if(b.textContent.includes(TERMS[currentIdx].answer)) b.classList.add('correct');
+    });
+  }
+
+  const t = TERMS[currentIdx];
+  els.verdict.textContent = isCorrect ? '正解です' : '不正解です';
+  els.verdict.className = 'verdict ' + (isCorrect ? 'correct' : 'incorrect');
+  els.chapterPill.textContent = CHAPTERS[t.ch];
+  els.explainText.textContent = t.explain;
+  els.result.style.display = 'block';
+
+  els.skipBtn.style.display = 'none';
+  els.nextBtn.style.display = 'block';
+}
+
+els.select.addEventListener('change', rebuildPool);
+els.skipBtn.addEventListener('click', drawNext);
+els.nextBtn.addEventListener('click', drawNext);
+
+document.addEventListener('keydown', (e)=>{
+  if((e.code === 'ArrowRight' || e.code === 'Enter') && els.nextBtn.style.display !== 'none'){
+    drawNext();
+  }
+});
+
+buildCategoryOptions();
+rebuildPool();
+</script>
+</body>
+</html>
