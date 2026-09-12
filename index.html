@@ -296,7 +296,7 @@
   <button class="act btn-primary" id="nextBtn" style="display:none;">次の問題</button>
 </div>
 
-<footer>全44問・第1〜5章 ／ カテゴリを選ぶと、そのカテゴリ内だけからランダム出題します。</footer>
+<footer>全44問・第1〜5章 ／ 章を選ぶと、その章の範囲内だけからランダム出題します。</footer>
 
 <script>
 const CATS = {
@@ -316,6 +316,13 @@ const CHAPTERS = {
   3: "第3章　現在の生成AI（ジェネレーティブAI）の動向",
   4: "第4章　情報リテラシー・基本理念とAI社会原則",
   5: "第5章　テキスト生成AIのプロンプト制作と実例"
+};
+const CHAPTER_SHORT = {
+  1: "第1章",
+  2: "第2章",
+  3: "第3章",
+  4: "第4章",
+  5: "第5章"
 };
 
 const TERMS = [
@@ -399,9 +406,9 @@ const els = {
 function buildCategoryOptions(){
   const opt = document.createElement('option');
   opt.value = 'all';
-  opt.textContent = 'すべてのカテゴリ';
+  opt.textContent = 'すべての章';
   els.select.appendChild(opt);
-  Object.entries(CATS).forEach(([key, label])=>{
+  Object.entries(CHAPTERS).forEach(([key, label])=>{
     const o = document.createElement('option');
     o.value = key;
     o.textContent = label;
@@ -422,7 +429,7 @@ function rebuildPool(){
   const val = els.select.value;
   pool = TERMS
     .map((t,i)=>i)
-    .filter(i => val === 'all' || TERMS[i].cat === val);
+    .filter(i => val === 'all' || String(TERMS[i].ch) === val);
   bag = shuffle(pool);
   score = {correct:0, attempted:0};
   els.poolCount.textContent = pool.length;
@@ -439,10 +446,15 @@ function updateScore(){
 function pickDistractors(correctIdx, n){
   const t = TERMS[correctIdx];
   let sameCat = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && TERMS[i].cat===t.cat);
-  let others = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && TERMS[i].cat!==t.cat);
+  let sameCh = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && TERMS[i].ch===t.ch && TERMS[i].cat!==t.cat);
+  let others = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && TERMS[i].ch!==t.ch && TERMS[i].cat!==t.cat);
   sameCat = shuffle(sameCat);
+  sameCh = shuffle(sameCh);
   others = shuffle(others);
   let picks = sameCat.slice(0, n);
+  if(picks.length < n){
+    picks = picks.concat(sameCh.slice(0, n - picks.length));
+  }
   if(picks.length < n){
     picks = picks.concat(others.slice(0, n - picks.length));
   }
@@ -463,7 +475,7 @@ function drawNext(){
 
 function renderQuestion(){
   const t = TERMS[currentIdx];
-  els.tagFront.textContent = CATS[t.cat];
+  els.tagFront.textContent = CHAPTER_SHORT[t.ch];
   els.idxFront.textContent = `${score.attempted + 1} / ${pool.length}`;
   els.termFront.textContent = t.term;
 
