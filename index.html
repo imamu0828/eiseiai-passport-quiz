@@ -98,6 +98,32 @@
   }
   .progress-text{font-size:13px; color:#9AA6B8;}
 
+  .mode-toggle{
+    width:100%;
+    max-width:620px;
+    display:flex;
+    gap:8px;
+    margin-bottom:18px;
+  }
+  .mode-btn{
+    flex:1;
+    padding:10px 8px;
+    background:var(--ink-2);
+    color:#9AA6B8;
+    border:1px solid #3A4557;
+    border-radius:6px;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .mode-btn.active{
+    background:var(--gold);
+    color:#fff;
+    border-color:var(--gold);
+  }
+
   .stage{width:100%; max-width:620px;}
   .card{
     position:relative;
@@ -146,6 +172,12 @@
     line-height:1.4;
     text-align:center;
     margin:8px 0 24px;
+  }
+  .term.sentence{
+    font-size:clamp(17px, 3.6vw, 21px);
+    font-weight:700;
+    line-height:1.9;
+    text-align:left;
   }
 
   .options{display:flex; flex-direction:column; gap:10px;}
@@ -267,7 +299,7 @@
 <body>
 
 <header>
-  <h1>生成AIパスポート 4択クイズ<span>用語の正しい説明を1つ選ぶ形式・章番号つき解説</span></h1>
+  <h1>生成AIパスポート 4択クイズ<span>用語↔説明を1つ選ぶ形式・章番号つき解説</span></h1>
   <div class="meta">出題プール <b id="poolCount">-</b> 問<br>正解 <b id="correctCount">0</b> / <b id="attemptedCount">0</b></div>
 </header>
 
@@ -276,11 +308,16 @@
   <div class="progress-text" id="progressText"></div>
 </div>
 
+<div class="mode-toggle" id="modeToggle">
+  <button class="mode-btn active" data-mode="term2desc">用語 → 説明を選ぶ</button>
+  <button class="mode-btn" data-mode="desc2term">説明 → 用語を選ぶ（穴埋め）</button>
+</div>
+
 <div class="stage">
   <div class="card" id="card">
     <div class="tag" id="tagFront">カテゴリ</div>
     <div class="card-index" id="idxFront"></div>
-    <div class="prompt-label">次の用語の正しい説明はどれ？</div>
+    <div class="prompt-label" id="promptLabel">次の用語の正しい説明はどれ？</div>
     <div class="term" id="termFront">読み込み中...</div>
     <div class="options" id="options"></div>
     <div class="result" id="result" style="display:none;">
@@ -296,7 +333,7 @@
   <button class="act btn-primary" id="nextBtn" style="display:none;">次の問題</button>
 </div>
 
-<footer>全145問・第1〜5章 ／ 章を選ぶと、その章の範囲内だけからランダム出題します。</footer>
+<footer>全182問・第1〜5章 ／ 章を選ぶと、その章の範囲内だけからランダム出題します。</footer>
 
 <script>
 const CATS = {
@@ -499,14 +536,60 @@ TERMS.push(
 {cat:"security",ch:4,term:"ベイト攻撃",answer:"魅力的な物やファイルを「餌（ベイト）」にして、被害者に不正なリンクやUSBメモリなどを使わせようとする攻撃手口。",explain:"ソーシャルエンジニアリング攻撃の一種で、人の好奇心や欲求につけ込む点が特徴。"}
 );
 
+TERMS.push(
+{cat:"ethics",ch:4,term:"AIの事業活動を担う3つの主体",answer:"AI開発者（AI Developer）、AI提供者（AI Provider）、AI利用者（AI Business User）の3つの立場のこと。",explain:"AI事業者ガイドラインにおいて、それぞれの立場に応じた役割や責任が整理されている。"},
+{cat:"ethics",ch:4,term:"AI事業者ガイドライン",answer:"AIの開発・提供・利用に関わる事業者が参照すべき、日本政府が策定した実務的な指針。",explain:"人間中心やセキュリティ確保などのAI社会原則を踏まえ、事業者が具体的に取り組むべき事項がまとめられている。"},
+{cat:"ethics",ch:4,term:"AI社会原則",answer:"AIの活用にあたって社会全体で尊重されるべき、人間中心・安全性・公平性・プライバシー保護などの基本原則。",explain:"日本政府が策定したもので、AI事業者ガイドラインなど、より具体的な指針の土台となっている。"},
+{cat:"law",ch:4,term:"AI新法",answer:"人工知能関連技術の研究開発及び活用の推進に関する法律の通称。",explain:"2025年6月4日に公布された法律で、AIの研究開発や活用を国として推進していくための基本的な枠組みを定めている。"},
+{cat:"history",ch:1,term:"AIとロボットの違い",answer:"AIは「考える仕組み」そのものを指すのに対し、ロボットはセンサーやアクチュエータを持つ「物理的な機械」を指すという区別。",explain:"ロボットにAIが搭載されることは多いが、AI自体はソフトウェア的な仕組みであり、両者は本来別の概念とされる。"},
+{cat:"gentech",ch:2,term:"ALBERT（A Lite BERT）",answer:"BERTのパラメータ数を削減し、軽量化・効率化を図った改良版のモデル。",explain:"性能を維持しながら計算資源を抑えることを目指した、BERT系モデルの派生形の一つ。"},
+{cat:"ml",ch:1,term:"ANI（弱いAI）",answer:"特定の分野やタスクに特化して能力を発揮する、現在実用化されているAIの多くが該当するタイプ。",explain:"幅広い課題に汎用的に対応できるとされるAGI（強いAI）に対する概念として位置づけられる。"},
+{cat:"gentech",ch:2,term:"BERTモデル",answer:"文章を双方向（前後両方向）から読み取ることで、文脈をより深く理解できるようにした言語モデル。",explain:"MLM（Masked Language Model）やNSPといった学習手法を用いており、Transformerをベースとした代表的なモデルの一つ。"},
+{cat:"gentech",ch:2,term:"ChatGPT",answer:"OpenAIが開発した、対話形式でやり取りできるテキスト生成AIサービス。",explain:"GPTシリーズの言語モデルをベースにしており、生成AIブームを大きく後押しした代表的なサービスの一つ。"},
+{cat:"gentech",ch:2,term:"Claude",answer:"Anthropicが開発した、対話形式で利用できる生成AIサービス。",explain:"ChatGPTやGeminiと並ぶ主要な生成AIサービスの一つとして紹介されている。"},
+{cat:"gentech",ch:2,term:"Gemini",answer:"Googleが開発した、対話形式で利用できる生成AIサービス。",explain:"ChatGPTやClaudeと並ぶ主要な生成AIサービスの一つとして紹介されている。"},
+{cat:"gentech",ch:2,term:"Copilot",answer:"Microsoftが提供する、対話形式で利用できるAIアシスタントサービス。",explain:"ChatGPTやGemini、Claudeと並ぶ主要な生成AIサービスの一つとして紹介されている。"},
+{cat:"gentech",ch:2,term:"GPT-1",answer:"OpenAIが2018年に発表した、GPTシリーズ最初の言語モデル。",explain:"大量のテキストによる事前学習の後、少量のデータで個別タスクに適応させるという、後のGPTシリーズに続くアプローチの原型を示した。"},
+{cat:"gentech",ch:2,term:"GPT-2",answer:"GPT-1の後継として登場した、より大規模なパラメータ数を持つ言語モデル。",explain:"人間が書いたものと見分けがつきにくい自然な文章を生成できることが話題となり、悪用リスクへの懸念から公開方法が慎重に検討された。"},
+{cat:"gentech",ch:2,term:"GPT-3",answer:"GPT-2よりさらに大幅にパラメータ数を増やし、Few-Shotプロンプティングによって様々なタスクに対応できることを示した言語モデル。",explain:"具体的な追加学習をせずとも幅広いタスクをこなせる汎用性の高さが注目を集め、生成AIブームのきっかけの一つとなった。"},
+{cat:"gentech",ch:2,term:"InstructGPT",answer:"人間のフィードバックをもとにした強化学習（RLHF）を用いて、指示に従う能力を高めたGPT-3の改良版。",explain:"ユーザーの指示への追従性を高める調整手法は、その後のChatGPTの開発にも活かされた。"},
+{cat:"gentech",ch:2,term:"GPT-3.5",answer:"InstructGPTの流れを汲み、ChatGPTの初期リリースで使用された言語モデル。",explain:"対話形式でのやり取りに適した応答スタイルへと調整されており、ChatGPTの一般公開に大きく貢献した。"},
+{cat:"gentech",ch:2,term:"GPT-4",answer:"GPT-3.5の後継として登場した、テキストに加えて画像も扱えるマルチモーダルなGPTモデル。",explain:"より高度な推論能力を持つとされ、様々な分野の複雑なタスクへの対応力が向上した。"},
+{cat:"gentech",ch:2,term:"GPT-4o",answer:"テキスト・画像・音声などを統合的にリアルタイムで処理できるよう設計された、GPT-4の発展形モデル。",explain:"「o」はomni（すべて）を意味するとされ、マルチモーダル対応の強化が特徴とされる。"},
+{cat:"gentech",ch:2,term:"GPTs",answer:"ユーザーが特定の目的向けに、指示や知識、機能をカスタマイズして作成できるChatGPTのカスタム版の仕組み。",explain:"プログラミングの知識がなくても、独自のチャットボットのようなものを作成・共有できる機能として提供されている。"},
+{cat:"gentech",ch:2,term:"RLHF",answer:"AIの出力に対する人間の評価をもとに、強化学習によってモデルの応答を望ましい方向に調整する手法。",explain:"ChatGPTなどの対話型AIが、より自然で人間の意図に沿った応答をするよう調整する際に用いられている。"},
+{cat:"gentech",ch:2,term:"NLP（自然言語処理）",answer:"人間が日常的に使う言語を、コンピュータに処理・理解・生成させるための技術分野。",explain:"機械翻訳や文書分類、感情分析など、テキスト生成AIに関わる多くの技術の基盤となっている。"},
+{cat:"gentech",ch:2,term:"Code Interpreter",answer:"ChatGPTがプログラムコードを実行し、データ分析やファイル処理などを行えるようにする機能。",explain:"単なる文章生成にとどまらず、実際に計算やグラフ作成などを行わせることができる点が特徴。"},
+{cat:"gentech",ch:2,term:"Codex",answer:"OpenAIが開発した、プログラミングコードの生成に特化したAIモデル。",explain:"自然言語による指示から、対応するプログラムコードを生成する能力に優れている。"},
+{cat:"gentech",ch:2,term:"Sora",answer:"OpenAIが開発した、テキストの指示から動画を生成する動画生成AI。",explain:"文章による説明だけで、比較的自然でリアルな映像を生成できる点が注目を集めた。"}
+);
+
+TERMS.push(
+{cat:"business",ch:3,term:"Model Context Protocol（MCP）",answer:"AIエージェントが、外部のツールやデータソースと連携するための標準的な接続方法を定めた仕組み。",explain:"この仕組みにより、AIエージェントがさまざまな外部サービスと柔軟に連携し、複雑なタスクを実行しやすくなる。"},
+{cat:"gentech",ch:2,term:"NSP（Next Sentence Prediction）",answer:"2つの文章が、実際に連続する文章かどうかをモデルに判定させる学習タスク。",explain:"BERTの事前学習で用いられた手法の一つで、MLM（Masked Language Model）と組み合わせて文脈理解力を高めるために使われた。"},
+{cat:"gentech",ch:2,term:"OpenAI",answer:"ChatGPTやGPTシリーズ、Sora、Codexなどを開発している、生成AI分野を代表するアメリカのAI企業。",explain:"対話型AIサービス「ChatGPT」を公開したことで、世の中に生成AIを広く知らしめた企業として知られる。"},
+{cat:"gentech",ch:2,term:"Operator",answer:"OpenAIが開発した、AIが自らウェブサイトを操作してタスクを代行するエージェント機能。",explain:"AIエージェントの実用例の一つで、フォーム入力や予約など、人に代わってウェブ上の作業を自動的に行うことを目指している。"},
+{cat:"security",ch:4,term:"悪意のあるQRコード",answer:"読み取らせることで、不正なウェブサイトへ誘導したり、マルウェアに感染させたりすることを狙った偽装QRコード。",explain:"フィッシング詐欺の手口の一つとして、インターネットリテラシーの観点から注意が呼びかけられている。"},
+{cat:"gentech",ch:2,term:"RoBERTa",answer:"BERTの学習方法や学習データの与え方を見直し、性能を向上させた改良版モデル。",explain:"より大規模なデータと学習時間を用いることで、BERTより高い精度を達成したとされる。"},
+{cat:"gentech",ch:2,term:"Self-Attention（自己注意力）",answer:"一つの文章の中で、単語同士が互いにどれだけ関連しているかを計算する仕組み。",explain:"Attention Mechanismの一種で、Transformerが文脈を理解するための中核的な技術とされる。"},
+{cat:"ethics",ch:4,term:"持続可能な社会（Sustainability）",answer:"AIの活用が、現在の世代だけでなく将来の世代にとっても、環境や社会に配慮した形で持続していくことを重視する考え方。",explain:"人間の尊厳が尊重される社会、多様な背景を持つ人々が多様な幸せを追求できる社会と並ぶ、AI社会の基本理念の一つ。"},
+{cat:"gentech",ch:5,term:"Temperature",answer:"生成AIの出力のランダム性・多様性を調整するパラメータ。",explain:"値を高くすると多様で創造的な出力になりやすく、低くすると一貫性の高い出力になりやすいとされる。"},
+{cat:"gentech",ch:5,term:"Top-p",answer:"出力候補の確率の合計が一定の値になるまでの単語群だけから、次の単語を選択する生成パラメータ。",explain:"Temperatureと並んで、生成AIの出力の多様性や一貫性を調整するために用いられる。"},
+{cat:"gentech",ch:3,term:"Veo3",answer:"Googleが開発した動画生成AIモデル。",explain:"Soraなどと並ぶ、近年登場した高性能な動画生成AIの一つとして位置づけられる。"},
+{cat:"security",ch:4,term:"Wi-Fiに潜む罠",answer:"セキュリティ対策が不十分な公衆Wi-Fiなどを利用することで、通信内容を盗み見られたり、悪意のあるアクセスポイントに接続させられたりするリスク。",explain:"フィッシング詐欺や悪意のあるQRコードと並ぶ、インターネット利用時に注意すべきリスクの一つとされる。"}
+);
+
 let pool = [];
 let bag = [];
 let currentIdx = -1;
 let answered = false;
 let score = {correct:0, attempted:0};
+let quizMode = 'term2desc';
 
 const els = {
   select: document.getElementById('categorySelect'),
+  modeToggle: document.getElementById('modeToggle'),
+  promptLabel: document.getElementById('promptLabel'),
   tagFront: document.getElementById('tagFront'),
   idxFront: document.getElementById('idxFront'),
   termFront: document.getElementById('termFront'),
@@ -593,21 +676,36 @@ function drawNext(){
   renderQuestion();
 }
 
+function buildFillBlankSentence(t){
+  const base = t.answer.replace(/。\s*$/, '');
+  return `${base}を（　　）という。`;
+}
+
 function renderQuestion(){
   const t = TERMS[currentIdx];
   els.tagFront.textContent = CHAPTER_SHORT[t.ch];
   els.idxFront.textContent = `${score.attempted + 1} / ${pool.length}`;
-  els.termFront.textContent = t.term;
 
   const distractorIdx = pickDistractors(currentIdx, 3);
   const optionIdxs = shuffle([currentIdx, ...distractorIdx]);
+
+  if(quizMode === 'term2desc'){
+    els.promptLabel.textContent = '次の用語の正しい説明はどれ？';
+    els.termFront.textContent = t.term;
+    els.termFront.classList.remove('sentence');
+  } else {
+    els.promptLabel.textContent = '次の説明に当てはまる用語はどれ？';
+    els.termFront.textContent = buildFillBlankSentence(t);
+    els.termFront.classList.add('sentence');
+  }
 
   els.options.innerHTML = '';
   const letters = ['A','B','C','D'];
   optionIdxs.forEach((idx, i)=>{
     const btn = document.createElement('button');
     btn.className = 'option';
-    btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${TERMS[idx].answer}</span>`;
+    const label = quizMode === 'term2desc' ? TERMS[idx].answer : TERMS[idx].term;
+    btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${label}</span>`;
     btn.addEventListener('click', ()=> handleAnswer(idx, btn));
     els.options.appendChild(btn);
   });
@@ -634,8 +732,9 @@ function handleAnswer(selectedIdx, btnEl){
     else if(b === btnEl && !isCorrect){ b.classList.add('incorrect'); }
   });
   if(!isCorrect){
+    const correctLabel = quizMode === 'term2desc' ? TERMS[currentIdx].answer : TERMS[currentIdx].term;
     optionButtons.forEach(b=>{
-      if(b.textContent.includes(TERMS[currentIdx].answer)) b.classList.add('correct');
+      if(b.textContent.includes(correctLabel)) b.classList.add('correct');
     });
   }
 
@@ -653,6 +752,15 @@ function handleAnswer(selectedIdx, btnEl){
 els.select.addEventListener('change', rebuildPool);
 els.skipBtn.addEventListener('click', drawNext);
 els.nextBtn.addEventListener('click', drawNext);
+
+els.modeToggle.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.mode-btn');
+  if(!btn || btn.classList.contains('active')) return;
+  Array.from(els.modeToggle.children).forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  quizMode = btn.dataset.mode;
+  drawNext();
+});
 
 document.addEventListener('keydown', (e)=>{
   if((e.code === 'ArrowRight' || e.code === 'Enter') && els.nextBtn.style.display !== 'none'){
