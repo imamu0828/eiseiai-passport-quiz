@@ -107,13 +107,13 @@
   }
   .mode-btn{
     flex:1;
-    padding:10px 8px;
+    padding:10px 6px;
     background:var(--ink-2);
     color:#9AA6B8;
     border:1px solid #3A4557;
     border-radius:6px;
     font-family:'Zen Kaku Gothic New', sans-serif;
-    font-size:13px;
+    font-size:12px;
     font-weight:700;
     cursor:pointer;
     transition:background .15s ease, color .15s ease;
@@ -163,6 +163,16 @@
     font-size:13px;
     color:var(--text-muted);
     margin-top:14px;
+  }
+  .prompt-label.as-heading{
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:700;
+    font-size:clamp(16px, 3.6vw, 19px);
+    color:var(--text-dark);
+    line-height:1.8;
+    text-align:left;
+    margin-top:6px;
+    margin-bottom:6px;
   }
   .term{
     font-family:'Shippori Mincho B1', serif;
@@ -309,8 +319,9 @@
 </div>
 
 <div class="mode-toggle" id="modeToggle">
-  <button class="mode-btn active" data-mode="term2desc">用語 → 説明を選ぶ</button>
-  <button class="mode-btn" data-mode="desc2term">説明 → 用語を選ぶ（穴埋め）</button>
+  <button class="mode-btn active" data-mode="term2desc">用語→説明</button>
+  <button class="mode-btn" data-mode="desc2term">説明→用語(穴埋め)</button>
+  <button class="mode-btn" data-mode="statement">正誤問題</button>
 </div>
 
 <div class="stage">
@@ -333,7 +344,7 @@
   <button class="act btn-primary" id="nextBtn" style="display:none;">次の問題</button>
 </div>
 
-<footer>全182問・第1〜5章 ／ 章を選ぶと、その章の範囲内だけからランダム出題します。</footer>
+<footer>用語→説明・穴埋め：全188問／正誤問題：全54問・第1〜5章 ／ 章を選ぶと、その章の範囲内だけからランダム出題します。</footer>
 
 <script>
 const CATS = {
@@ -565,6 +576,15 @@ TERMS.push(
 );
 
 TERMS.push(
+{cat:"gentech",ch:2,term:"Claudeのモデル階層（Haiku・Sonnet・Opus）",answer:"Anthropicが提供するClaudeシリーズにおける、軽量・高速な「Haiku」、バランス型の「Sonnet」、最上位の「Opus」という、性能や用途に応じたモデルの区分。",explain:"※2026年9月現在、これらに加えて、Opusよりもさらに上位に位置づけられる「Mythos」というクラスのモデルも提供されている。"},
+{cat:"gentech",ch:2,term:"Claude Mythos",answer:"Anthropicが提供するモデルのうち、Opusよりもさらに上位に位置づけられる、最上位クラスのモデル群の名称。",explain:"※2026年9月現在、Mythos 5.1が最新世代とされ、生物・サイバーセキュリティ・AI研究開発分野への安全対策を強化した派生版「Fable 5.1」も並行して提供されている。"},
+{cat:"gentech",ch:2,term:"GPTシリーズの歴史",answer:"OpenAIが2018年のGPT-1を皮切りに、GPT-2、GPT-3、GPT-3.5、GPT-4などを経て、継続的にモデルを更新してきた大規模言語モデルの系譜。",explain:"※2026年9月現在、GPT-5世代からさらに進んだ新しい世代のモデルの発表が続いている。"},
+{cat:"gentech",ch:2,term:"Gemini（Google I/Oでの発表）",answer:"Googleが開発する生成AIで、Google I/Oなどのイベントを通じて、テキスト・画像・動画などを統合的に扱えるマルチモーダルなモデルとして発表・更新され続けているシリーズ。",explain:"※2026年9月現在も、Google I/Oや定期的なアップデートを通じて新しいバージョンが発表され続けている。"},
+{cat:"gentech",ch:2,term:"Copilotとマイクロソフト製品への統合",answer:"Microsoftが、Office製品やWindows、GitHubなど自社の幅広い製品にAIアシスタント機能を組み込む際に用いている、統一的なブランド名。",explain:"文章作成や表計算、プログラミング支援など、利用する製品に応じて多様な形でAIアシスタントとしての役割を果たす。"},
+{cat:"gentech",ch:2,term:"4大生成AIサービスの提供企業",answer:"ChatGPTはOpenAI、GeminiはGoogle、ClaudeはAnthropic、CopilotはMicrosoftが、それぞれ開発・提供している対話型の生成AIサービスである、という4社の対応関係。",explain:"いずれも対話形式で利用できる代表的な生成AIサービスとして、シラバス内でも「その他の主要生成AI」として紹介されている。"}
+);
+
+TERMS.push(
 {cat:"business",ch:3,term:"Model Context Protocol（MCP）",answer:"AIエージェントが、外部のツールやデータソースと連携するための標準的な接続方法を定めた仕組み。",explain:"この仕組みにより、AIエージェントがさまざまな外部サービスと柔軟に連携し、複雑なタスクを実行しやすくなる。"},
 {cat:"gentech",ch:2,term:"NSP（Next Sentence Prediction）",answer:"2つの文章が、実際に連続する文章かどうかをモデルに判定させる学習タスク。",explain:"BERTの事前学習で用いられた手法の一つで、MLM（Masked Language Model）と組み合わせて文脈理解力を高めるために使われた。"},
 {cat:"gentech",ch:2,term:"OpenAI",answer:"ChatGPTやGPTシリーズ、Sora、Codexなどを開発している、生成AI分野を代表するアメリカのAI企業。",explain:"対話型AIサービス「ChatGPT」を公開したことで、世の中に生成AIを広く知らしめた企業として知られる。"},
@@ -578,6 +598,338 @@ TERMS.push(
 {cat:"gentech",ch:3,term:"Veo3",answer:"Googleが開発した動画生成AIモデル。",explain:"Soraなどと並ぶ、近年登場した高性能な動画生成AIの一つとして位置づけられる。"},
 {cat:"security",ch:4,term:"Wi-Fiに潜む罠",answer:"セキュリティ対策が不十分な公衆Wi-Fiなどを利用することで、通信内容を盗み見られたり、悪意のあるアクセスポイントに接続させられたりするリスク。",explain:"フィッシング詐欺や悪意のあるQRコードと並ぶ、インターネット利用時に注意すべきリスクの一つとされる。"}
 );
+
+const STATEMENT_QUESTIONS = [
+{ch:1,term:"機械学習",type:"find_wrong",statements:[
+"機械学習とは、コンピュータが大量のデータからパターンやルールを自動的に学習する手法の総称である。",
+"機械学習には、正解ラベルを与えて学習させる教師あり学習と、正解ラベルを与えない教師なし学習などの種類がある。",
+"機械学習では、人間があらかじめすべての判断ルールを一つひとつプログラムに記述する必要がある。",
+"機械学習の手法の一つである強化学習は、試行錯誤を通じて報酬を得ながら学習する。"
+],correctIndex:2,explanation:"機械学習は、人間がすべてのルールを記述するのではなく、データから統計的な規則性を自動的に見つけ出す点が特徴である。"},
+{ch:1,term:"ディープラーニング",type:"find_right",statements:[
+"ディープラーニングは、正解ラベルが一切なくても必ず高い精度を発揮できる、唯一の機械学習手法である。",
+"ディープラーニングは、人間の脳の神経回路を模した多層のニューラルネットワークを用いる機械学習の手法である。",
+"ディープラーニングは、第一次AIブームの時代に実用化され、その後急速に廃れていった手法である。",
+"ディープラーニングは、必ず教師なし学習の形でのみ用いられる手法である。"
+],correctIndex:1,explanation:"ディープラーニングは多層のニューラルネットワークを用いる手法で、教師あり学習・教師なし学習・強化学習など様々な学習方式と組み合わせて用いられる、第三次AIブームを支えた技術である。"},
+{ch:1,term:"教師あり学習",type:"find_wrong",statements:[
+"教師あり学習は、入力データと正解ラベルの組み合わせを与えて学習させる方式である。",
+"教師あり学習は、迷惑メール判定や画像分類など、正解が明確なタスクに用いられる。",
+"教師あり学習では、モデルが出力した予測と正解ラベルとの誤差をもとに、パラメータが調整される。",
+"教師あり学習は、正解ラベルの用意が一切不要な学習方式である。"
+],correctIndex:3,explanation:"正解ラベルが不要なのは教師なし学習の特徴であり、教師あり学習にはラベル付きデータが必要である。"},
+{ch:1,term:"強化学習",type:"find_right",statements:[
+"強化学習は、入力と正解ラベルのペアを大量に用意して学習させる、教師あり学習の一種である。",
+"強化学習は、エージェントが試行錯誤を通じて環境から報酬を得ながら、望ましい行動を学習する手法である。",
+"強化学習は、ラベルのないデータを似た性質でグループ分けする手法である。",
+"強化学習は、AlphaGoなどのゲームAIには一切用いられていない手法である。"
+],correctIndex:1,explanation:"強化学習は報酬をもとに行動を学習する手法で、AlphaGoなどのゲームAIや、生成AIの応答調整（RLHF）にも応用されている。"},
+{ch:1,term:"シンギュラリティ（技術的特異点）",type:"find_wrong",statements:[
+"シンギュラリティとは、AIが人間の知能を超え、技術の進歩が人間の制御を離れて加速度的に進むと予測される仮説上の時点を指す。",
+"シンギュラリティの概念は、ヴァーナー・ヴィンジによって提唱された。",
+"レイ・カーツワイルは、シンギュラリティが2045年に到来すると予測したことで知られる。",
+"シンギュラリティが到来する時期や、そもそも実現するかどうかについては、専門家の間で完全に意見が一致している。"
+],correctIndex:3,explanation:"シンギュラリティの実現時期や是非については、専門家の間でも意見が分かれており、完全な合意があるわけではない。"},
+{ch:1,term:"第三次AIブーム",type:"find_right",statements:[
+"第三次AIブームは、1980年代のエキスパートシステムの実用化によって起きたブームである。",
+"第三次AIブームは、ディープラーニングの実用化とビッグデータの蓄積を背景に、2010年代以降起きているブームである。",
+"第三次AIブームは、探索や推論によって特定の問題を解けることが示されたことによるブームである。",
+"第三次AIブームは、これまでの2回のブームと同様に、成果が上がらずすでに終息している。"
+],correctIndex:1,explanation:"第三次AIブームはディープラーニングの実用化とビッグデータの普及を背景に、2010年代以降現在まで続いているブームとされる。第一次・第二次AIブームの説明とは区別される。"},
+{ch:1,term:"チューリングテスト",type:"find_wrong",statements:[
+"チューリングテストは、会話の受け答えだけで相手が人間か機械か判別できなければ、その機械は知能を持つとみなす思考実験である。",
+"チューリングテストは、アラン・チューリングによって提案された。",
+"チューリングテストは、機械の内部構造や計算方法そのものを直接調べることで知能の有無を判定する手法である。",
+"チューリングテストは、外部から見た振る舞いをもとに知能を判定しようとする発想に基づいている。"
+],correctIndex:2,explanation:"チューリングテストは、機械の内部構造を直接調べるのではなく、外部から見た会話の受け答え（振る舞い）だけをもとに知能を判定しようとするテストである。"},
+{ch:1,term:"過学習（オーバーフィッティング）",type:"find_right",statements:[
+"過学習とは、訓練データの量が少なすぎて、モデルがまったく学習できていない状態を指す。",
+"過学習とは、訓練データに適合しすぎるあまり、未知のデータへの予測精度がかえって低下してしまう現象である。",
+"過学習は、正則化やドロップアウトなどの手法によって、悪化させることを目的として利用される。",
+"過学習は、教師なし学習でのみ発生し、教師あり学習では発生しない現象である。"
+],correctIndex:1,explanation:"過学習は訓練データへの過剰な適合により汎化性能が低下する現象で、正則化・ドロップアウト・アーリーストッピングなどの手法によって回避（防止）が図られる。"},
+{ch:1,term:"エキスパートシステム",type:"find_wrong",statements:[
+"エキスパートシステムは、専門家の知識やルールをコンピュータに蓄積し、専門的な判断や助言を行わせる仕組みである。",
+"エキスパートシステムは、第二次AIブームを代表する手法として、医療診断などの分野で活用された。",
+"エキスパートシステムは、知識の入力や更新に限界があり、これがAIの冬を迎える一因ともなった。",
+"エキスパートシステムは、データから自動的にパターンを学習するディープラーニングの一種である。"
+],correctIndex:3,explanation:"エキスパートシステムは人間があらかじめ定めたルールベースの仕組みであり、データから自動的にパターンを学習するディープラーニングとは異なるアプローチである。"},
+{ch:1,term:"AGI（強いAI）とANI（弱いAI）",type:"find_right",statements:[
+"ANI（弱いAI）は、人間と同じように幅広い課題に汎用的に対応できる知能を持つAIを指す。",
+"AGI（強いAI）は、特定の分野やタスクに特化して能力を発揮するAIを指す。",
+"現在実用化されているAIの多くはANI（弱いAI）に分類され、AGI（強いAI）は現時点ではまだ実現していないとされる。",
+"AGIとANIは、どちらも同じ意味を持つ、単なる呼び方の違いにすぎない。"
+],correctIndex:2,explanation:"ANI（弱いAI）は特定の分野に特化したAIで、現在実用化されているAIの多くがこれにあたる。AGI（強いAI）は人間のように汎用的な知能を持つAIとされ、現時点では実現していない。この2つを混同して説明する誤りに注意。"},
+
+{ch:2,term:"GAN（敵対的生成ネットワーク）",type:"find_wrong",statements:[
+"GANは、「生成器」と「識別器」という2つのネットワークを競わせながら学習させる手法である。",
+"GANの生成器は、本物らしいデータを作り出そうとする役割を担う。",
+"GANの識別器は、生成器が作ったデータが本物か偽物かを判定する役割を担う。",
+"GANは、生成器と識別器が協力し合うことで学習が進む仕組みであり、両者が競争することはない。"
+],correctIndex:3,explanation:"GANは生成器と識別器が「競争」することによって学習が進む仕組みであり、協力し合うわけではない。"},
+{ch:2,term:"VAE（変分自己符号化器）",type:"find_right",statements:[
+"VAEは、正解ラベルと入力データの組み合わせを大量に必要とする教師あり学習専用の手法である。",
+"VAEは、データを圧縮した潜在ベクトルに変換し、そこから元データに近いデータを復元・生成する生成モデルの一種である。",
+"VAEは、GANと同様に、生成器と識別器の2つのネットワークを競わせる手法である。",
+"VAEは、エンコーダとデコーダのうち、エンコーダのみで構成されているモデルである。"
+],correctIndex:1,explanation:"VAEはエンコーダとデコーダから構成され、データを潜在ベクトルに圧縮した後、そこから元データに近いデータを復元・生成する生成モデルである。"},
+{ch:2,term:"トランスフォーマー",type:"find_wrong",statements:[
+"トランスフォーマーは、Attention（注意機構）という仕組みを中核に据えた深層学習のモデル構造である。",
+"トランスフォーマーは、2017年に発表されて以降、多くのLLMのベースアーキテクチャとして採用されている。",
+"トランスフォーマーは、文章中の単語同士の関係性を効率よく捉えられる点が特徴である。",
+"トランスフォーマーは、画像や文章などのデータをまったく扱うことができない、音声処理専用のモデルである。"
+],correctIndex:3,explanation:"トランスフォーマーは音声専用ではなく、文章・画像など幅広いデータに応用されている汎用性の高いモデル構造である。"},
+{ch:2,term:"BERTモデル",type:"find_right",statements:[
+"BERTモデルは、文章を一方向（前から後ろへ）にのみ読み取ることで学習するモデルである。",
+"BERTモデルは、文章を双方向（前後両方向）から読み取ることで、文脈をより深く理解できるようにしたモデルである。",
+"BERTモデルは、GANの一種であり、生成器と識別器から構成される。",
+"BERTモデルは、画像生成に特化したモデルであり、テキストの処理はできない。"
+],correctIndex:1,explanation:"BERTモデルはMLMやNSPといった学習手法を用い、文章を双方向から読み取ることで文脈理解力を高めたTransformerベースのモデルである。"},
+{ch:2,term:"ハルシネーション",type:"find_wrong",statements:[
+"ハルシネーションとは、生成AIが事実に基づかない誤った情報を、もっともらしく生成してしまう現象である。",
+"ハルシネーションは、LLMが統計的にそれらしい文章を作る仕組みであることに起因するとされる。",
+"RAG（検索拡張生成）は、外部情報を参照させることでハルシネーションの抑制に役立つとされる。",
+"ハルシネーションが起きたAIの出力は、常に事実確認なしでそのまま信頼してよい。"
+],correctIndex:3,explanation:"ハルシネーションのリスクがあるからこそ、生成AIの出力は事実確認をせずに鵜呑みにしてはならないとされる。"},
+{ch:2,term:"RLHF",type:"find_right",statements:[
+"RLHFは、AIの出力に対する人間の評価をもとに、強化学習によってモデルの応答を望ましい方向に調整する手法である。",
+"RLHFは、人間の評価をまったく用いず、AIが完全に自律的に学習する手法である。",
+"RLHFは、画像生成AIにのみ用いられ、対話型AIには使用されない手法である。",
+"RLHFは、GAN特有の学習手法であり、他のモデルには応用できない。"
+],correctIndex:0,explanation:"RLHFは人間の評価（フィードバック）をもとにした強化学習で、ChatGPTなどの対話型AIがより自然で意図に沿った応答をするように調整する際に用いられている。"},
+{ch:2,term:"マルチモーダルAI",type:"find_wrong",statements:[
+"マルチモーダルAIは、テキスト・画像・音声・動画など、複数の種類の情報を組み合わせて扱えるAIである。",
+"マルチモーダルAIは、画像を見ながら質問に答えるなど、より柔軟な情報処理を可能にする。",
+"マルチモーダルAIは、テキストのみを扱うAIよりも、扱える情報の幅が狭くなる。",
+"GPT-4は、テキストに加えて画像も扱えるマルチモーダルなモデルとして登場した。"
+],correctIndex:2,explanation:"マルチモーダルAIは複数の情報の種類を組み合わせて扱えるため、テキストのみを扱うAIよりも扱える情報の幅は広くなる。"},
+{ch:2,term:"ファインチューニング",type:"find_right",statements:[
+"ファインチューニングとは、汎用的に学習済みのモデルに対し、特定の目的や分野のデータで追加学習を行う手法である。",
+"ファインチューニングは、必ずゼロから新しいモデルを作り直す作業のことを指す。",
+"ファインチューニングを行うと、必ず過学習が発生し、性能が悪化する。",
+"ファインチューニングは、モデルのパラメータを一切変更しない手法である。"
+],correctIndex:0,explanation:"ファインチューニングはゼロから学習させるより少ないデータ・計算資源で、特定用途に適したモデルを作れる手法である。"},
+{ch:2,term:"GPT-3",type:"find_wrong",statements:[
+"GPT-3は、GPT-2よりさらに大幅にパラメータ数を増やした言語モデルである。",
+"GPT-3は、Few-Shotプロンプティングによって様々なタスクに対応できることを示した。",
+"GPT-3をベースに、人間のフィードバックを活用したInstructGPTが開発された。",
+"GPT-3は、OpenAIではなくGoogleによって開発されたモデルである。"
+],correctIndex:3,explanation:"GPT-3はGoogleではなくOpenAIによって開発されたモデルである。"},
+{ch:2,term:"LSTM（長・短期記憶）",type:"find_right",statements:[
+"LSTMは、RNNが抱えていた、長い文章では過去の情報をうまく覚えられないという課題を改善した、改良型のネットワーク構造である。",
+"LSTMは、Transformerが登場した後に、Transformerを置き換える目的で開発されたモデルである。",
+"LSTMは、画像認識にのみ使われ、自然言語処理には使われない手法である。",
+"LSTMは、重要な情報を保持する仕組みを一切持たない、単純な構造のネットワークである。"
+],correctIndex:0,explanation:"LSTMはRNNの課題を改善し、重要な情報を長期間保持する仕組みを備えたモデルで、Transformer登場以前の自然言語処理モデルの発展を支えた。"},
+
+{ch:3,term:"RAG（検索拡張生成）",type:"find_wrong",statements:[
+"RAGは、LLMが回答を生成する際に、外部の文書やデータベースを検索し、その情報を踏まえて回答を作る仕組みである。",
+"RAGを活用することで、モデルが学習していない最新の情報や社内固有の情報を扱えるようになる。",
+"RAGは、ハルシネーションの抑制に役立つとされている。",
+"RAGは、外部データを一切参照せず、モデルの内部知識だけで回答を生成する仕組みである。"
+],correctIndex:3,explanation:"RAGはむしろ外部の文書やデータベースを検索・参照することで回答を生成する仕組みであり、内部知識だけに頼るわけではない。"},
+{ch:3,term:"AIエージェント",type:"find_right",statements:[
+"AIエージェントは、与えられた目標に対して自ら計画を立て、複数のツールや処理を組み合わせながら自律的にタスクを遂行するAIシステムである。",
+"AIエージェントは、単発の質問に一言だけ答えることに特化しており、複数の作業を組み合わせることはできない。",
+"AIエージェントは、MCPのような外部連携の仕組みを一切利用できない。",
+"AIエージェントという概念は、生成AIが登場する以前から存在せず、今後も実現される見込みがない。"
+],correctIndex:0,explanation:"AIエージェントは、情報収集から実行までの一連の作業を自律的に行える点が特徴で、MCPなどの仕組みを用いて外部ツールと連携することもある。"},
+{ch:3,term:"ディープフェイク",type:"find_wrong",statements:[
+"ディープフェイクは、AI技術を用いて、実在の人物の顔や声を精巧に加工・合成した偽の画像・映像・音声である。",
+"ディープフェイクは、なりすましや偽情報の拡散、名誉毀損などに悪用されるリスクが指摘されている。",
+"ディープフェイクは、主にGANや拡散モデルなどの技術を活用して作られる。",
+"高度に進化したディープフェイクであっても、人間やAIが見れば必ず一目で真偽を見分けることができる。"
+],correctIndex:3,explanation:"高度に進化したディープフェイクは、AI技術をもってしても情報の真偽を見分けることが困難な場合があるとされている。"},
+{ch:3,term:"Model Context Protocol（MCP）",type:"find_right",statements:[
+"MCPは、AIエージェントが外部のツールやデータソースと連携するための標準的な接続方法を定めた仕組みである。",
+"MCPは、AIモデルの内部パラメータを直接書き換えるための手法である。",
+"MCPは、画像生成AIの画質を向上させるための圧縮技術である。",
+"MCPは、生成AIの学習データからバイアスを完全に取り除く技術である。"
+],correctIndex:0,explanation:"MCPはAIエージェントが外部ツールやサービスと柔軟に連携できるようにするための標準的な仕組みである。"},
+{ch:3,term:"動画生成AI",type:"find_wrong",statements:[
+"動画生成AIは、AIが学習したデータをもとに、新しい映像や動画を自動生成する生成AIの一種である。",
+"Soraは、OpenAIが開発した動画生成AIの一つである。",
+"Veo3は、Googleが開発した動画生成AIモデルである。",
+"動画生成AIは、静止画像やテキストの生成AIとはまったく別の学習原理に基づいており、共通する技術要素は一切ない。"
+],correctIndex:3,explanation:"動画生成AIも画像生成AIなどと同様に、拡散モデルなど共通する生成技術の要素を活用しているとされ、まったく別の学習原理というわけではない。"},
+{ch:3,term:"コパイロット（AIアシスタント）",type:"find_right",statements:[
+"コパイロットは、人間の作業を補助・支援する形で活用される生成AIの利用形態を指す。",
+"コパイロットは、人間の判断や作業をすべて置き換え、人が一切関与しない自律型のシステムのみを指す言葉である。",
+"コパイロットという利用形態は、文章作成やプログラミングなどの分野では活用できない。",
+"Copilotという名称のサービスは存在せず、あくまで抽象的な概念にすぎない。"
+],correctIndex:0,explanation:"コパイロットは人と協調しながら業務効率化を図る生成AIの利用形態を指す。MicrosoftのCopilotのように、実際にこの名称を冠したサービスも存在する。"},
+{ch:3,term:"テキスト生成AI",type:"find_wrong",statements:[
+"テキスト生成AIは、AIが学習した大量の文章データをもとに、新しい文章を自動生成する生成AIの一種である。",
+"ChatGPTは、テキスト生成AIの代表例の一つである。",
+"テキスト生成AIは、文章の要約や翻訳、感情分析など、幅広いタスクに活用されている。",
+"テキスト生成AIは、あらゆる作業において常に完璧な精度を発揮し、不得意な作業は一切存在しない。"
+],correctIndex:3,explanation:"テキスト生成AIには、正確な文字数の指定や計算、最新の情報の反映など、不得意とされる作業がある。"},
+{ch:3,term:"ハイパーパーソナライゼーション",type:"find_right",statements:[
+"ハイパーパーソナライゼーションとは、生成AIなどを活用し、個々のユーザーの行動や好みに合わせて体験やコンテンツを高度に個別化することである。",
+"ハイパーパーソナライゼーションとは、すべてのユーザーに全く同じ内容を一律に提供する手法のことである。",
+"ハイパーパーソナライゼーションは、マーケティングや商品レコメンドの分野では活用されていない。",
+"ハイパーパーソナライゼーションには、生成AIなどの技術は一切関与しない。"
+],correctIndex:0,explanation:"ハイパーパーソナライゼーションは、生成AIなどを活用して個別対応を高度化する取り組みで、マーケティングや商品レコメンドの分野で注目されている。"},
+{ch:3,term:"音楽生成AI・音声生成AI・画像生成AI",type:"find_wrong",statements:[
+"音楽生成AIは、AIが学習したデータをもとに、新しい楽曲やメロディーを自動生成する生成AIの一種である。",
+"音声生成AIは、AIが学習したデータをもとに、人の声や音声を合成・生成する生成AIの一種である。",
+"画像生成AIには、拡散モデルやGANなどの技術が用いられることが多い。",
+"音楽生成AI・音声生成AI・画像生成AIは、それぞれまったく異なる目的のAIであり、いずれも生成AIという分類には含まれない。"
+],correctIndex:3,explanation:"音楽生成AI・音声生成AI・画像生成AIは、いずれも学習したデータから新しいコンテンツを生み出す「生成AI」というカテゴリに含まれる、その活用分野の一つである。"},
+{ch:3,term:"Veo3",type:"find_right",statements:[
+"Veo3は、Googleが開発した動画生成AIモデルである。",
+"Veo3は、Microsoftが開発した表計算ソフトの一機能である。",
+"Veo3は、音声のみを生成し、映像はまったく生成できないモデルである。",
+"Veo3は、生成AIとは無関係な、従来型の動画編集ソフトである。"
+],correctIndex:0,explanation:"Veo3はGoogleが開発した動画生成AIモデルで、Soraなどと並ぶ近年登場した高性能な動画生成AIの一つとされる。"},
+
+{ch:4,term:"著作権とAI生成物の関係",type:"find_wrong",statements:[
+"AIが自律的に生成したコンテンツには、原則として人間の「創作的寄与」がない限り著作権は発生しないとされる。",
+"生成物を学習データとして利用する行為をめぐっては、著作権侵害の可能性が論点となる。",
+"生成物が既存の著作物と類似する場合、著作権侵害の可能性が論点となる。",
+"AIが生成したものであれば、内容にかかわらず必ず自動的に著作権が発生する。"
+],correctIndex:3,explanation:"AI生成物には、原則として人間の創作的寄与がない限り著作権は発生しないとされており、生成しただけで自動的に著作権が発生するわけではない。"},
+{ch:4,term:"営業秘密",type:"find_right",statements:[
+"営業秘密とは、企業が事業活動上保有する、秘密として管理されている有用な技術上・営業上の情報である。",
+"営業秘密は、公開されている情報であればあるほど、法的な保護が強くなる。",
+"営業秘密に該当するための要件には、秘密として管理されていないことが含まれる。",
+"営業秘密は、不正競争防止法ではなく、著作権法によって保護される情報である。"
+],correctIndex:0,explanation:"営業秘密は秘密管理性・有用性・非公知性の3要件を満たす情報で、不正競争防止法によって保護される。"},
+{ch:4,term:"ソーシャルエンジニアリング攻撃",type:"find_wrong",statements:[
+"ソーシャルエンジニアリング攻撃は、人の心理的な隙や信頼を悪用して情報を盗み取ろうとする攻撃手法である。",
+"スピアフィッシングは、特定の個人や組織を狙う標的型のフィッシング詐欺の一種である。",
+"プレテキストは、もっともらしい口実や作り話を用いて相手を信用させ、情報を聞き出そうとする手口である。",
+"ソーシャルエンジニアリング攻撃は、技術的な脆弱性のみを突く攻撃であり、人の心理は一切関係しない。"
+],correctIndex:3,explanation:"ソーシャルエンジニアリング攻撃は、技術的な脆弱性ではなく、人の心理的な隙や信頼を悪用する点が特徴である。"},
+{ch:4,term:"個人情報保護法",type:"find_right",statements:[
+"個人情報保護法は、個人情報の適正な取り扱いについて定めた法律である。",
+"個人情報保護法は、生成AIに個人情報を入力する行為とは一切関係がない法律である。",
+"要配慮個人情報は、通常の個人情報よりも緩やかなルールで取り扱ってよいとされている。",
+"匿名加工情報は、個人情報保護法上、いかなる場合も第三者への提供が禁止されている。"
+],correctIndex:0,explanation:"個人情報保護法は個人情報の適正な取り扱いを定めた法律で、生成AIへの個人情報の入力や出力との関係でも問題になり得る。要配慮個人情報は通常より厳格な、匿名加工情報は一定の手続きを踏めば提供可能な取り扱いとなる。"},
+{ch:4,term:"AI社会原則",type:"find_wrong",statements:[
+"AI社会原則には、人間中心、安全性・公平性、プライバシー保護、セキュリティ確保、透明性、アカウンタビリティなどが含まれる。",
+"AI社会原則は、日本政府が策定したものである。",
+"AI社会原則は、AI事業者ガイドラインなど、より具体的な指針の土台となっている。",
+"AI社会原則は、AI開発者だけが守ればよく、AI提供者やAI利用者には一切関係がない。"
+],correctIndex:3,explanation:"AI社会原則やAI事業者ガイドラインは、AI開発者・AI提供者・AI利用者という3つの主体それぞれに関わる指針として整理されている。"},
+{ch:4,term:"限定提供データ",type:"find_right",statements:[
+"限定提供データとは、業として特定の者に提供する情報として、電磁的方法により相当量蓄積され、かつ管理されているデータである。",
+"限定提供データは、営業秘密とまったく同じ要件で保護される情報である。",
+"限定提供データは、著作権法によってのみ保護され、不正競争防止法とは無関係である。",
+"限定提供データに該当するためには、秘密として厳重に管理されていることが必須の要件である。"
+],correctIndex:0,explanation:"限定提供データは、営業秘密とは異なる3要件（限定提供性・相当蓄積性・電磁的管理性）を満たすことで、不正競争防止法上保護される情報である。"},
+{ch:4,term:"肖像権とパブリシティ権",type:"find_wrong",statements:[
+"肖像権は、本人の承諾なく、顔や姿を無断で撮影・公開・利用されない権利である。",
+"パブリシティ権は、有名人の氏名や肖像が持つ経済的な価値を、本人が独占的に利用できる権利である。",
+"生成AIが実在の人物に似た画像を生成した場合、肖像権やパブリシティ権の侵害が論点となり得る。",
+"肖像権とパブリシティ権は、まったく同じ利益を保護する、完全に同一の権利である。"
+],correctIndex:3,explanation:"肖像権は人格的な利益を、パブリシティ権は主に経済的な利益を保護するものであり、両者は保護する利益の性質が異なる。"},
+{ch:4,term:"マルウェア",type:"find_right",statements:[
+"マルウェアとは、コンピュータやスマートフォンに害を及ぼすことを目的として作られた、悪意のあるソフトウェアの総称である。",
+"ランサムウェアは、マルウェアには含まれない、まったく別のカテゴリの技術である。",
+"マルウェアへの対策として、アンチウイルスソフトウェアは一切有効ではない。",
+"マルウェアは、必ず物理的な機器の破損のみを引き起こし、データの被害は発生しない。"
+],correctIndex:0,explanation:"マルウェアは悪意のあるソフトウェアの総称で、ランサムウェアもその一種であり、アンチウイルスソフトウェアによる対策が有効とされる。"},
+{ch:4,term:"プロンプトインジェクション",type:"find_wrong",statements:[
+"プロンプトインジェクションは、悪意のある指示文をプロンプトに紛れ込ませることで、AIに開発者の意図しない動作をさせる攻撃手法である。",
+"プロンプトインジェクションによって、チャットボットに機密情報を出力させたり、安全対策を無効化させたりする恐れがある。",
+"プロンプトインジェクションは、生成AIの技術的発展に潜む脅威の一つとされている。",
+"プロンプトインジェクションは、生成AIが登場する以前から存在し、生成AIとは一切無関係な概念である。"
+],correctIndex:3,explanation:"プロンプトインジェクションは、まさに生成AI（特に指示に従うLLM）を対象とした攻撃手法として生まれた、生成AI特有のリスクの一つである。"},
+{ch:4,term:"著作権法第30条の4",type:"find_right",statements:[
+"著作権法第30条の4は、情報解析（AIの学習など）を目的とする場合、一定の条件のもとで著作権者の許諾なく著作物を利用できると定めた規定である。",
+"著作権法第30条の4は、いかなる場合でも著作権者の許諾なく著作物を自由に利用できることを保証する規定である。",
+"著作権法第30条の4は、個人情報保護法の一部を構成する規定である。",
+"著作権法第30条の4は、AIの学習利用を全面的に禁止する規定である。"
+],correctIndex:0,explanation:"この規定はAI開発における学習データ利用を後押しする一方、著作権者の利益を不当に害する場合は適用されないという例外もある。"},
+
+{ch:5,term:"プロンプトエンジニアリング",type:"find_wrong",statements:[
+"プロンプトエンジニアリングとは、生成AIから望ましい出力を得るために、プロンプトの内容や構成を工夫する技術・手法である。",
+"役割設定や出力形式の指定は、プロンプトエンジニアリングの代表的なテクニックの一つとされる。",
+"プロンプトエンジニアリングは、AIのモデル自体のパラメータを直接書き換える作業を指す。",
+"プロンプトエンジニアリングを工夫することで、生成AIの回答の精度が変わることがある。"
+],correctIndex:2,explanation:"プロンプトエンジニアリングはモデル自体を書き換えるのではなく、あくまで入力する指示文（プロンプト）の内容や構成を工夫する技術である。"},
+{ch:5,term:"Zero-ShotプロンプティングとFew-Shotプロンプティング",type:"find_right",statements:[
+"Zero-Shotプロンプティングは、具体例を一切示さず、指示だけでタスクを実行させる方法である。",
+"Few-Shotプロンプティングは、具体例を一切示さずにタスクを実行させる方法である。",
+"Zero-Shotプロンプティングは、必ず複数の具体例を提示しなければ成立しない方法である。",
+"Few-Shotプロンプティングは、精度に関係なく、常にZero-Shotより劣る結果しか生まないとされている。"
+],correctIndex:0,explanation:"Zero-Shotは具体例を示さず指示だけでタスクを行わせる方法、Few-Shotはいくつかの具体例を示した上でタスクを行わせる方法であり、両者の定義を取り違えた誤りに注意。"},
+{ch:5,term:"Chain-of-Thought（思考の連鎖）",type:"find_wrong",statements:[
+"Chain-of-Thoughtは、AIに途中の推論過程を出力させることで、回答の精度を高めるプロンプト手法である。",
+"Chain-of-Thoughtは、計算や論理的な問題など、複雑なタスクにおいて特に効果を発揮するとされる。",
+"Chain-of-Thoughtは、「段階的に考えてください」といった指示によって引き出すことができる。",
+"Chain-of-Thoughtは、AIの学習方法そのものを変更する、モデルの訓練段階の手法である。"
+],correctIndex:3,explanation:"Chain-of-Thoughtはモデルの訓練段階の手法ではなく、プロンプトの工夫によって推論過程を引き出す、利用段階のテクニックである。"},
+{ch:5,term:"プロンプトの構成要素",type:"find_right",statements:[
+"プロンプトを構成する基本要素には、Instruction（指示）、Context（文脈）、Input Data（入力データ）、Output Indicator（出力指定）などがある。",
+"プロンプトには、Instruction（指示）以外の要素を含めることは一切許されない。",
+"Context（文脈）は、AIに出力してほしい形式を指定する要素である。",
+"Output Indicator（出力指定）は、AIに処理させる対象となる具体的なデータを指す要素である。"
+],correctIndex:0,explanation:"Context（文脈）は状況や背景情報を伝える要素、Output Indicator（出力指定）は出力してほしい形式を指定する要素、Input Data（入力データ）は処理させる対象のデータを指す要素であり、これらの定義を取り違えないよう注意。"},
+{ch:5,term:"Temperature",type:"find_wrong",statements:[
+"Temperatureは、生成AIの出力のランダム性・多様性を調整するパラメータである。",
+"Temperatureの値を高くすると、より多様で創造的な出力になりやすいとされる。",
+"Temperatureの値を低くすると、より一貫性の高い出力になりやすいとされる。",
+"Temperatureは、AIの応答速度（レスポンスタイム）を直接調整するためのパラメータである。"
+],correctIndex:3,explanation:"Temperatureは出力の内容の多様性・ランダム性を調整するパラメータであり、応答速度そのものを調整するものではない。"},
+{ch:5,term:"Top-p",type:"find_right",statements:[
+"Top-pは、出力候補の確率の合計が一定の値になるまでの単語群だけから、次の単語を選択する生成パラメータである。",
+"Top-pは、常にすべての候補の中から確率が最も低い単語だけを選び続けるパラメータである。",
+"Top-pは、Temperatureとはまったく異なる目的で使われ、出力の多様性には一切関係しない。",
+"Top-pは、生成AIの学習データの量を直接指定するパラメータである。"
+],correctIndex:0,explanation:"Top-pはTemperatureと並んで、生成AIの出力の多様性や一貫性を調整するために用いられるパラメータである。"},
+{ch:5,term:"テキスト生成AIが不得意なこと",type:"find_wrong",statements:[
+"正確な文字数の指定は、テキスト生成AIが苦手とされる作業の一つである。",
+"計算や、学習後に起きた最新の出来事への対応は、テキスト生成AIが苦手とされる作業に含まれる。",
+"芸術作品の批評は、テキスト生成AIが苦手とされる作業の一つとされる。",
+"テキスト生成AIには、原理的な苦手分野は一切存在せず、すべてのタスクを完璧にこなせる。"
+],correctIndex:3,explanation:"テキスト生成AIは確率的にもっともらしい文章を作る仕組みのため、厳密な数値の指定や最新情報への対応などに限界があるとされる。"},
+{ch:5,term:"感情分析・機械翻訳・文書分類",type:"find_wrong",statements:[
+"感情分析は、文章に含まれる書き手の感情や意見を、AIが判定・分類する技術である。",
+"機械翻訳は、ある言語で書かれた文章を、AIが別の言語の文章に自動的に変換する技術である。",
+"文書分類は、文章の内容を分析し、あらかじめ定められたカテゴリに自動的に振り分けるタスクである。",
+"感情分析・機械翻訳・文書分類は、いずれもテキスト生成AI・自然言語処理とは無関係な、画像処理専用の技術である。"
+],correctIndex:3,explanation:"感情分析・機械翻訳・文書分類は、いずれもテキスト生成AI・自然言語処理（NLP）に関わる代表的な活用例である。"},
+{ch:5,term:"ハイパーパラメータ",type:"find_wrong",statements:[
+"ハイパーパラメータは、モデルの学習が始まる前に、人間があらかじめ設定しておく必要があるパラメータである。",
+"学習率やTemperature、Top-pは、ハイパーパラメータの代表例とされる。",
+"ハイパーパラメータは、学習の過程で自動的に調整される、通常のパラメータと同じものである。",
+"ハイパーパラメータの設定は、モデルの学習結果に影響を与えることがある。"
+],correctIndex:2,explanation:"ハイパーパラメータは学習によって自動調整される通常のパラメータとは区別され、人間があらかじめ設定しておく必要がある値である。"},
+{ch:5,term:"プレトレーニングとファインチューニング",type:"find_right",statements:[
+"プレトレーニングは、大規模なテキストデータなどを使って、LLMにあらかじめ言語の基礎的なパターンを学習させておく事前学習の工程である。",
+"ファインチューニングは、プレトレーニングより前に必ず行われる工程である。",
+"プレトレーニングとファインチューニングは、まったく同じ工程を指す同義語である。",
+"プレトレーニングを行ったモデルは、その後いかなる追加学習も行うことができない。"
+],correctIndex:0,explanation:"プレトレーニング（事前学習）の後にファインチューニングを行うことで、実用的な目的に合わせたモデルに仕上げられるという順序であり、他の選択肢の説明はいずれも誤りである。"},
+
+{ch:2,term:"ChatGPTとOpenAIの歴史",type:"find_wrong",statements:[
+"ChatGPTは、OpenAIが開発した対話形式のテキスト生成AIサービスである。",
+"ChatGPTのベースとなる言語モデルは、2018年のGPT-1から始まり、その後GPT-2、GPT-3、GPT-4などへと発展してきた。",
+"※2026年9月現在、OpenAIはGPT-5世代からさらに進んだ新しい世代のモデルを発表している。",
+"ChatGPTは公開されて以来、モデルやバージョンが一度も更新されたことがない。"
+],correctIndex:3,explanation:"ChatGPTは公開後も継続的にモデルの更新が行われており、2026年9月現在も新しい世代のモデルが発表され続けている。"},
+{ch:2,term:"Gemini",type:"find_right",statements:[
+"Geminiは、Googleが開発した、テキストや画像など複数の情報を扱えるマルチモーダルな生成AIである。",
+"Geminiは、Anthropicが開発した生成AIサービスの名称である。",
+"Geminiは、2026年に入ってからは一度もアップデートされていない。",
+"Geminiという名称は、Microsoftの社内プロジェクトコードネームにすぎず、一般提供されたことはない。"
+],correctIndex:0,explanation:"GeminiはGoogleが開発したマルチモーダル生成AIで、2026年に入ってからもGoogle I/Oなどを通じて新しいバージョンが発表され続けている（※2026年9月現在）。"},
+{ch:2,term:"Claudeのモデル階層とMythos",type:"find_wrong",statements:[
+"Claudeは、Anthropicが開発した対話形式の生成AIサービスである。",
+"ClaudeにはHaiku・Sonnet・Opusという、性能や用途に応じたモデルの区分がある。",
+"※2026年9月現在、Opusよりもさらに上位のクラスとして、Mythosというモデル群が提供されている。",
+"Claudeのモデルは、公開されて以降、名称も性能もまったく変更されたことがない。"
+],correctIndex:3,explanation:"Claudeはこれまでにも複数回モデルが更新されており、2026年9月現在ではHaiku・Sonnet・Opusに加え、Mythosという最上位クラスのモデル群も提供されている。"},
+{ch:2,term:"Copilot",type:"find_right",statements:[
+"Copilotは、Microsoftが提供する、対話形式で利用できるAIアシスタントサービスである。",
+"Copilotは、Appleが提供するAIアシスタントサービスの名称である。",
+"Copilotは、Office製品やWindows、GitHubなど、Microsoft製品への統合を一切行っていない。",
+"Copilotという名称は、生成AIとはまったく無関係な、従来型のヘルプ機能を指す言葉である。"
+],correctIndex:0,explanation:"CopilotはMicrosoftが提供するAIアシスタントサービスで、Office・Windows・GitHubなど幅広い製品に統合されている。"}
+];
 
 let pool = [];
 let bag = [];
@@ -630,9 +982,15 @@ function shuffle(arr){
 
 function rebuildPool(){
   const val = els.select.value;
-  pool = TERMS
-    .map((t,i)=>i)
-    .filter(i => val === 'all' || String(TERMS[i].ch) === val);
+  if(quizMode === 'statement'){
+    pool = STATEMENT_QUESTIONS
+      .map((q,i)=>i)
+      .filter(i => val === 'all' || String(STATEMENT_QUESTIONS[i].ch) === val);
+  } else {
+    pool = TERMS
+      .map((t,i)=>i)
+      .filter(i => val === 'all' || String(TERMS[i].ch) === val);
+  }
   bag = shuffle(pool);
   score = {correct:0, attempted:0};
   els.poolCount.textContent = pool.length;
@@ -681,32 +1039,70 @@ function buildFillBlankSentence(t){
   return `${base}を（　　）という。`;
 }
 
-function renderQuestion(){
-  const t = TERMS[currentIdx];
-  els.tagFront.textContent = CHAPTER_SHORT[t.ch];
-  els.idxFront.textContent = `${score.attempted + 1} / ${pool.length}`;
+let currentQData = null;
 
+function getQuestionData(){
+  if(quizMode === 'statement'){
+    const q = STATEMENT_QUESTIONS[currentIdx];
+    const promptText = q.type === 'find_wrong'
+      ? `「${q.term}」に関して不適切な記述をしている文章を1つ選びなさい。`
+      : `「${q.term}」に関して正しい記述をしている文章を1つ選びなさい。`;
+    const options = q.statements.map((s, i)=>({label: s, correct: i === q.correctIndex}));
+    return {
+      promptText,
+      termDisplay: null,
+      isSentence: false,
+      options,
+      chapterShort: CHAPTER_SHORT[q.ch],
+      chapterLabel: CHAPTERS[q.ch],
+      explanation: q.explanation
+    };
+  }
+
+  const t = TERMS[currentIdx];
   const distractorIdx = pickDistractors(currentIdx, 3);
   const optionIdxs = shuffle([currentIdx, ...distractorIdx]);
+  const options = optionIdxs.map(idx => ({
+    label: quizMode === 'term2desc' ? TERMS[idx].answer : TERMS[idx].term,
+    correct: idx === currentIdx
+  }));
+  return {
+    promptText: quizMode === 'term2desc' ? '次の用語の正しい説明はどれ？' : '次の説明に当てはまる用語はどれ？',
+    termDisplay: quizMode === 'term2desc' ? t.term : buildFillBlankSentence(t),
+    isSentence: quizMode !== 'term2desc',
+    options,
+    chapterShort: CHAPTER_SHORT[t.ch],
+    chapterLabel: CHAPTERS[t.ch],
+    explanation: t.explain
+  };
+}
 
-  if(quizMode === 'term2desc'){
-    els.promptLabel.textContent = '次の用語の正しい説明はどれ？';
-    els.termFront.textContent = t.term;
-    els.termFront.classList.remove('sentence');
+function renderQuestion(){
+  const data = getQuestionData();
+  currentQData = data;
+
+  els.tagFront.textContent = data.chapterShort;
+  els.idxFront.textContent = `${score.attempted + 1} / ${pool.length}`;
+  els.promptLabel.textContent = data.promptText;
+  els.promptLabel.classList.toggle('as-heading', data.termDisplay === null);
+
+  if(data.termDisplay === null){
+    els.termFront.style.display = 'none';
   } else {
-    els.promptLabel.textContent = '次の説明に当てはまる用語はどれ？';
-    els.termFront.textContent = buildFillBlankSentence(t);
-    els.termFront.classList.add('sentence');
+    els.termFront.style.display = '';
+    els.termFront.textContent = data.termDisplay;
+    els.termFront.classList.toggle('sentence', data.isSentence);
   }
+
+  const shuffledOptions = shuffle(data.options.map((o,i)=>i)).map(i=>data.options[i]);
 
   els.options.innerHTML = '';
   const letters = ['A','B','C','D'];
-  optionIdxs.forEach((idx, i)=>{
+  shuffledOptions.forEach((opt, i)=>{
     const btn = document.createElement('button');
     btn.className = 'option';
-    const label = quizMode === 'term2desc' ? TERMS[idx].answer : TERMS[idx].term;
-    btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${label}</span>`;
-    btn.addEventListener('click', ()=> handleAnswer(idx, btn));
+    btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt.label}</span>`;
+    btn.addEventListener('click', ()=> handleAnswer(opt.correct, btn));
     els.options.appendChild(btn);
   });
 
@@ -715,34 +1111,30 @@ function renderQuestion(){
   els.skipBtn.style.display = 'block';
 }
 
-function handleAnswer(selectedIdx, btnEl){
+function handleAnswer(isCorrect, btnEl){
   if(answered) return;
   answered = true;
   score.attempted += 1;
-  const isCorrect = selectedIdx === currentIdx;
   if(isCorrect) score.correct += 1;
   updateScore();
 
   const optionButtons = Array.from(els.options.children);
-  optionButtons.forEach(b => b.classList.add('disabled'));
-  optionButtons.forEach(b => { b.onclick = null; });
+  optionButtons.forEach(b => { b.classList.add('disabled'); b.onclick = null; });
 
-  optionButtons.forEach((b, i)=>{
-    if(b === btnEl && isCorrect){ b.classList.add('correct'); }
-    else if(b === btnEl && !isCorrect){ b.classList.add('incorrect'); }
-  });
-  if(!isCorrect){
-    const correctLabel = quizMode === 'term2desc' ? TERMS[currentIdx].answer : TERMS[currentIdx].term;
+  if(isCorrect){
+    btnEl.classList.add('correct');
+  } else {
+    btnEl.classList.add('incorrect');
+    const correctLabel = currentQData.options.find(o=>o.correct).label;
     optionButtons.forEach(b=>{
       if(b.textContent.includes(correctLabel)) b.classList.add('correct');
     });
   }
 
-  const t = TERMS[currentIdx];
   els.verdict.textContent = isCorrect ? '正解です' : '不正解です';
   els.verdict.className = 'verdict ' + (isCorrect ? 'correct' : 'incorrect');
-  els.chapterPill.textContent = CHAPTERS[t.ch];
-  els.explainText.textContent = t.explain;
+  els.chapterPill.textContent = currentQData.chapterLabel;
+  els.explainText.textContent = currentQData.explanation;
   els.result.style.display = 'block';
 
   els.skipBtn.style.display = 'none';
@@ -759,7 +1151,7 @@ els.modeToggle.addEventListener('click', (e)=>{
   Array.from(els.modeToggle.children).forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   quizMode = btn.dataset.mode;
-  drawNext();
+  rebuildPool();
 });
 
 document.addEventListener('keydown', (e)=>{
