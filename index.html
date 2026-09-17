@@ -153,10 +153,49 @@
   }
   .card-index{
     position:absolute;
-    top:18px; right:20px;
+    top:18px; right:48px;
     font-size:12px;
     color:var(--text-muted);
     font-variant-numeric: tabular-nums;
+  }
+  .bookmark-btn{
+    position:absolute;
+    top:10px; right:12px;
+    width:30px; height:30px;
+    border:none;
+    background:transparent;
+    font-size:20px;
+    line-height:1;
+    color:var(--line);
+    cursor:pointer;
+    padding:0;
+  }
+  .bookmark-btn.active{
+    color:var(--stamp);
+  }
+  .bookmark-filter{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:#9AA6B8;
+    cursor:pointer;
+    user-select:none;
+    white-space:nowrap;
+  }
+  .bookmark-filter input{
+    width:15px; height:15px;
+    accent-color:var(--stamp);
+    cursor:pointer;
+  }
+  .empty-state{
+    background:var(--paper);
+    border-radius:3px;
+    padding:40px 24px;
+    text-align:center;
+    color:var(--text-muted);
+    font-size:14px;
+    line-height:1.9;
   }
   .prompt-label{
     text-align:center;
@@ -315,8 +354,11 @@
 
 <div class="controls">
   <select id="categorySelect"></select>
-  <div class="progress-text" id="progressText"></div>
+  <label class="bookmark-filter">
+    <input type="checkbox" id="bookmarkFilterCheckbox">★ブックマークのみ
+  </label>
 </div>
+<div class="progress-text" id="progressText" style="max-width:620px; width:100%; margin:-10px 0 14px;"></div>
 
 <div class="mode-toggle" id="modeToggle">
   <button class="mode-btn active" data-mode="term2desc">用語→説明</button>
@@ -328,6 +370,7 @@
   <div class="card" id="card">
     <div class="tag" id="tagFront">カテゴリ</div>
     <div class="card-index" id="idxFront"></div>
+    <button class="bookmark-btn" id="bookmarkBtn" title="ブックマーク">☆</button>
     <div class="prompt-label" id="promptLabel">次の用語の正しい説明はどれ？</div>
     <div class="term" id="termFront">読み込み中...</div>
     <div class="options" id="options"></div>
@@ -337,9 +380,12 @@
       <div class="explain-body" id="explainText"></div>
     </div>
   </div>
+  <div class="empty-state" id="emptyState" style="display:none;">
+    ブックマークした問題がまだありません。<br>問題右上の☆をタップすると、ここに表示されるようになります。
+  </div>
 </div>
 
-<div class="actions">
+<div class="actions" id="actionsRow">
   <button class="act btn-secondary" id="skipBtn">この問題をスキップ</button>
   <button class="act btn-primary" id="nextBtn" style="display:none;">次の問題</button>
 </div>
@@ -938,9 +984,36 @@ let answered = false;
 let score = {correct:0, attempted:0};
 let quizMode = 'term2desc';
 
+const BOOKMARK_KEY = 'seiseiaiPassportQuizBookmarks_v1';
+
+function loadBookmarks(){
+  try{
+    const raw = localStorage.getItem(BOOKMARK_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  }catch(e){
+    return new Set();
+  }
+}
+
+function saveBookmarks(){
+  try{
+    localStorage.setItem(BOOKMARK_KEY, JSON.stringify([...bookmarks]));
+  }catch(e){
+    // localStorage unavailable; bookmarks stay in-memory for this session only
+  }
+}
+
+let bookmarks = loadBookmarks();
+
+function keyForIndex(i){
+  return quizMode === 'statement' ? ('stmt:' + STATEMENT_QUESTIONS[i].term) : ('term:' + TERMS[i].term);
+}
+
 const els = {
   select: document.getElementById('categorySelect'),
   modeToggle: document.getElementById('modeToggle'),
+  bookmarkFilterCheckbox: document.getElementById('bookmarkFilterCheckbox'),
+  bookmarkBtn: document.getElementById('bookmarkBtn'),
   promptLabel: document.getElementById('promptLabel'),
   tagFront: document.getElementById('tagFront'),
   idxFront: document.getElementById('idxFront'),
@@ -956,6 +1029,9 @@ const els = {
   correctCount: document.getElementById('correctCount'),
   attemptedCount: document.getElementById('attemptedCount'),
   progressText: document.getElementById('progressText'),
+  card: document.getElementById('card'),
+  emptyState: document.getElementById('emptyState'),
+  actionsRow: document.getElementById('actionsRow'),
 };
 
 function buildCategoryOptions(){
@@ -991,6 +1067,9 @@ function rebuildPool(){
       .map((t,i)=>i)
       .filter(i => val === 'all' || String(TERMS[i].ch) === val);
   }
+  if(els.bookmarkFilterCheckbox.checked){
+    pool = pool.filter(i => bookmarks.has(keyForIndex(i)));
+  }
   bag = shuffle(pool);
   score = {correct:0, attempted:0};
   els.poolCount.textContent = pool.length;
@@ -1023,6 +1102,16 @@ function pickDistractors(correctIdx, n){
 }
 
 function drawNext(){
+  if(pool.length === 0){
+    els.card.style.display = 'none';
+    els.actionsRow.style.display = 'none';
+    els.emptyState.style.display = 'block';
+    return;
+  }
+  els.card.style.display = '';
+  els.actionsRow.style.display = 'flex';
+  els.emptyState.style.display = 'none';
+
   if(bag.length === 0){
     bag = shuffle(pool);
     if(bag.length > 1 && bag[bag.length-1] === currentIdx){
@@ -1084,6 +1173,10 @@ function renderQuestion(){
   els.tagFront.textContent = data.chapterShort;
   els.idxFront.textContent = `${score.attempted + 1} / ${pool.length}`;
   els.promptLabel.textContent = data.promptText;
+
+  const bookmarked = bookmarks.has(keyForIndex(currentIdx));
+  els.bookmarkBtn.textContent = bookmarked ? '★' : '☆';
+  els.bookmarkBtn.classList.toggle('active', bookmarked);
   els.promptLabel.classList.toggle('as-heading', data.termDisplay === null);
 
   if(data.termDisplay === null){
@@ -1144,6 +1237,21 @@ function handleAnswer(isCorrect, btnEl){
 els.select.addEventListener('change', rebuildPool);
 els.skipBtn.addEventListener('click', drawNext);
 els.nextBtn.addEventListener('click', drawNext);
+
+els.bookmarkBtn.addEventListener('click', ()=>{
+  if(pool.length === 0) return;
+  const key = keyForIndex(currentIdx);
+  if(bookmarks.has(key)){
+    bookmarks.delete(key);
+  } else {
+    bookmarks.add(key);
+  }
+  saveBookmarks();
+  els.bookmarkBtn.textContent = bookmarks.has(key) ? '★' : '☆';
+  els.bookmarkBtn.classList.toggle('active', bookmarks.has(key));
+});
+
+els.bookmarkFilterCheckbox.addEventListener('change', rebuildPool);
 
 els.modeToggle.addEventListener('click', (e)=>{
   const btn = e.target.closest('.mode-btn');
