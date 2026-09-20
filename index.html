@@ -1152,15 +1152,55 @@ function updateScore(){
   els.progressText.textContent = `これまでに ${score.attempted} 問に解答（出題プール ${pool.length} 問）`;
 }
 
+const CONFUSABLE_GROUPS = [
+  ["Attention（注意機構）","Self-Attention（自己注意力）","Attention層","言語モデリング"],
+  ["GPT-1","GPT-2","GPT-3","GPT-3.5","GPT-4","GPT-4o","InstructGPT","GPTs"],
+  ["AIレベル1（単純な制御プログラム）","AIレベル2（ルールベースシステム）","AIレベル3（機械学習）","AIレベル4（ディープラーニング）"],
+  ["ANI（弱いAI）","AGI（強いAI）"],
+  ["エンコーダ","デコーダ"],
+  ["過学習","過学習の回避","オーバーフィッティング","ドロップアウト","正則化","アーリーストッピング"],
+  ["営業秘密","限定提供データ","営業秘密に該当するための3要件","限定提供データに該当するための3要件"],
+  ["肖像権","パブリシティ権","商標権","特許権","意匠権"],
+  ["著作権","著作権法第30条の4","著作権とAI生成物の関係","知的財産権"],
+  ["生成器","生成モデル","ボルツマンマシン","制約付きボルツマンマシン"],
+  ["回帰型ニューラルネットワーク（RNN）","LSTM（長・短期記憶）","RNNのループ構造（再帰構造）"],
+  ["蒸留（Distillation）","量子化（Quantization）","データ拡張（Data Augmentation）"],
+  ["セキュリティ","セキュリティ確保","セキュリティとプライバシー","プライバシー保護","プライバシー設定"],
+  ["インターネットリテラシー","デジタル市民権","テクノロジーの理解","教育・リテラシー"],
+  ["スピアフィッシング","プレテキスト","ベイト攻撃","ブラックメール","ソーシャルエンジニアリング攻撃"],
+  ["特徴量","次元削減","クラスタリング"],
+  ["Temperature","Top-p","ハイパーパラメータ","プレトレーニング"],
+  ["インストラクション","文脈（コンテキスト）","インプットデータ","アウトプットインジケータ"],
+  ["ゼロショット（プロンプティング）","フューショット（プロンプティング）","Chain-of-Thought（思考の連鎖）"],
+  ["ChatGPT","Claude","Gemini","Copilot","OpenAI"],
+  ["個人情報保護法","要配慮個人情報","機微情報（センシティブ情報）","匿名加工情報"],
+  ["マルウェア","ランサムウェア","アンチウイルスソフトウェア","悪意のあるQRコード"],
+  ["AI社会原則","共通の指針","AI事業者ガイドライン","AI新法"],
+  ["人工知能（AI）","機械学習","ディープラーニング（深層学習）","ニューラルネットワーク"],
+  ["教師あり学習","教師なし学習","強化学習","半教師あり学習"],
+  ["GenSpark","Manus","Skywork AI","AIエージェント"],
+  ["音楽生成AI","音声生成AI","画像生成AI","動画生成AI","テキスト生成AI"],
+  ["BERTモデル","ALBERT（A Lite BERT）","RoBERTa","MLM（Masked Language Model）","NSP（Next Sentence Prediction）"],
+];
+
 function pickDistractors(correctIdx, n){
   const t = TERMS[correctIdx];
-  let sameCat = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && TERMS[i].cat===t.cat);
-  let sameCh = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && TERMS[i].ch===t.ch && TERMS[i].cat!==t.cat);
-  let others = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && TERMS[i].ch!==t.ch && TERMS[i].cat!==t.cat);
+  const group = CONFUSABLE_GROUPS.find(g => g.includes(t.term));
+  let confusable = group
+    ? TERMS.map((x,i)=>i).filter(i => i!==correctIdx && group.includes(TERMS[i].term))
+    : [];
+  const confusableSet = new Set(confusable);
+  let sameCat = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && !confusableSet.has(i) && TERMS[i].cat===t.cat);
+  let sameCh = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && !confusableSet.has(i) && TERMS[i].ch===t.ch && TERMS[i].cat!==t.cat);
+  let others = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && !confusableSet.has(i) && TERMS[i].ch!==t.ch && TERMS[i].cat!==t.cat);
+  confusable = shuffle(confusable);
   sameCat = shuffle(sameCat);
   sameCh = shuffle(sameCh);
   others = shuffle(others);
-  let picks = sameCat.slice(0, n);
+  let picks = confusable.slice(0, n);
+  if(picks.length < n){
+    picks = picks.concat(sameCat.slice(0, n - picks.length));
+  }
   if(picks.length < n){
     picks = picks.concat(sameCh.slice(0, n - picks.length));
   }
