@@ -1374,30 +1374,31 @@ const CONFUSABLE_GROUPS = [
   ["文章の校正","文章の整理","例え話で理解を深める","ブレインストーミング","テキスト要約","文書分類"]
 ];
 
+const SYNONYM_GROUPS = [
+  ["過学習","オーバーフィッティング"]
+];
+
 function pickDistractors(correctIdx, n){
   const t = TERMS[correctIdx];
+  const syn = new Set();
+  SYNONYM_GROUPS.forEach(g=>{ if(g.includes(t.term)) g.forEach(x=>syn.add(x)); });
+  const all = TERMS.map((x,i)=>i)
+    .filter(i => i!==correctIdx && !syn.has(TERMS[i].term));
+
   const group = CONFUSABLE_GROUPS.find(g => g.includes(t.term));
-  let confusable = group
-    ? TERMS.map((x,i)=>i).filter(i => i!==correctIdx && group.includes(TERMS[i].term))
-    : [];
-  const confusableSet = new Set(confusable);
-  let sameCat = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && !confusableSet.has(i) && TERMS[i].cat===t.cat);
-  let sameCh = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && !confusableSet.has(i) && TERMS[i].ch===t.ch && TERMS[i].cat!==t.cat);
-  let others = TERMS.map((x,i)=>i).filter(i => i!==correctIdx && !confusableSet.has(i) && TERMS[i].ch!==t.ch && TERMS[i].cat!==t.cat);
+  let confusable = group ? all.filter(i => group.includes(TERMS[i].term)) : [];
+  const cs = new Set(confusable);
+  let sameCat = all.filter(i => !cs.has(i) && TERMS[i].cat===t.cat);
+  let sameCh  = all.filter(i => !cs.has(i) && TERMS[i].ch===t.ch && TERMS[i].cat!==t.cat);
+  let others  = all.filter(i => !cs.has(i) && TERMS[i].ch!==t.ch && TERMS[i].cat!==t.cat);
   confusable = shuffle(confusable);
   sameCat = shuffle(sameCat);
   sameCh = shuffle(sameCh);
   others = shuffle(others);
   let picks = confusable.slice(0, n);
-  if(picks.length < n){
-    picks = picks.concat(sameCat.slice(0, n - picks.length));
-  }
-  if(picks.length < n){
-    picks = picks.concat(sameCh.slice(0, n - picks.length));
-  }
-  if(picks.length < n){
-    picks = picks.concat(others.slice(0, n - picks.length));
-  }
+  if(picks.length < n) picks = picks.concat(sameCat.slice(0, n - picks.length));
+  if(picks.length < n) picks = picks.concat(sameCh.slice(0, n - picks.length));
+  if(picks.length < n) picks = picks.concat(others.slice(0, n - picks.length));
   return picks;
 }
 
@@ -1522,6 +1523,7 @@ function renderQuestion(){
     const btn = document.createElement('button');
     btn.className = 'option';
     btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt.label}</span>`;
+    if(opt.correct) btn.dataset.correct = '1';
     btn.addEventListener('click', ()=> handleAnswer(opt.correct, btn));
     els.options.appendChild(btn);
   });
@@ -1545,9 +1547,8 @@ function handleAnswer(isCorrect, btnEl){
     btnEl.classList.add('correct');
   } else {
     btnEl.classList.add('incorrect');
-    const correctLabel = currentQData.options.find(o=>o.correct).label;
     optionButtons.forEach(b=>{
-      if(b.textContent.includes(correctLabel)) b.classList.add('correct');
+      if(b.dataset.correct === '1') b.classList.add('correct');
     });
   }
 
